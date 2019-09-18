@@ -358,3 +358,67 @@ summarise(collegeData_grouped,
 
 ```
 
+####Pipe operator
+```{r}
+group_by(StuDF,
+         性別) -> StuDF_by性別
+
+mutate(
+  StuDF_by性別,
+  最高分=max(成績),
+  最低分=min(成績),
+  調分大小=(最高分-最低分)/5,
+  調分後成績=成績+調分大小
+) -> StuDF_依性別調分
+
+ungroup(StuDF_依性別調分) -> 
+  StuDF_調分後
+
+#使用pipe
+StuDF %>% # 將StuDF
+  group_by(性別) %>% # 依性別分群
+  mutate( # 接著計算各群的:
+    最高分=max(成績),
+    最低分=min(成績),
+    調分大小=(最高分-最低分)/5,
+    調分後成績=成績+調分大小
+  )  %>% 
+  ungroup() -> # 接著ungroup後輸出
+  StuDF_調分後
+```
+
+##將collegeData，依等級別,縣市名稱分群後,計算一年級男/女生比例後,找出男女生比例最高的等級別,縣市名稱組合。
+
+```{r}
+collegeData%>%
+  group_by(等級別,縣市名稱)%>%  #依等級別,縣市名稱分群
+  mutate(
+    一年級男女生比例=sum(一年級男生)/sum(一年級女生)  #計算一年級男/女生比例
+  )%>%
+  ungroup()->
+  collegeData_rate
+
+which.max(collegeData_rate$一年級男女生比例) ->locMax  #找出男女生比例最高的等級別,縣市名稱組合
+locMax
+collegeData_rate[locMax,]
+```
+
+##計算每位學生每學期的平均成績。
+
+##計算每位學生每學期學分數在必/選/通 三類的學分數比重。
+
+##學屆為100（即100學年入學）的學生，各系學生在學所修總學分數之中位數，何系最高？
+```{r}
+load(url("https://www.dropbox.com/s/duh5aaqgl2f5m3z/loopTranscriptData.Rda?raw=1"))
+```
+
+```{r}
+transcriptDataFinal%>%
+  group_by(學號,學期,學年)%>%
+  mutate(
+    平均成績=sum(學分數*學期成績)/sum(學分數)
+  )%>%
+  ungroup()->
+  transcriptDataFinal_mean
+```
+
