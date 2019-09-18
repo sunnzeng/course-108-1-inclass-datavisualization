@@ -231,3 +231,71 @@ select(collegeData,
        contains("男生"))
 ```
 
+### filter：條件選取觀測值
+
+##如果不用filter
+```{r}
+StuDF
+# logical vector
+logiChoose <- c(
+  F,F,F,T,T,F,T,F
+)#F也可以寫False,T也可以寫True
+# 使用logical vector選擇所要觀測值"女"
+StuDF[logiChoose,]#當作矩陣來取，取出女生的位置(4.5.7)
+```
+
+```{r}
+logiChoose
+which(logiChoose)
+slice(
+  StuDF,which(logiChoose)
+)#which是用來找True在哪裡
+```
+
+```{r}
+StuDF$性別=="女" # logical predicate
+
+logiChoose <- StuDF$性別=="女"
+StuDF[logiChoose,]
+```
+
+```{r}
+# relational operators
+StuDF$性別=="女" 
+StuDF$成績>60
+
+# combined with logical operator
+(StuDF$性別=="女" & StuDF$成績>60) -> logiChoose2#兩個條件同時成立
+logiChoose2
+
+StuDF[logiChoose2,]
+```
+
+##使用filter
+
+```{r}
+#filter(data frame, logical predicates)
+StuDF
+filter(StuDF,
+       性別=="女")
+filter(StuDF,
+       (性別=="女" & 成績>60))
+filter(StuDF,
+       性別=="女",
+       成績>60) # 多個AND條件可用,分隔
+```
+
+##依以下各別情境，選出collegeData中符合情境的觀測值：
+
+```{r}
+#縣市名稱為“30 臺北市”
+filter(collegeData,
+       縣市名稱=="30 臺北市")
+#縣市名稱為“30 臺北市”或“01 新北市”。（使用OR|或belong to%in%）
+filter(collegeData,
+       縣市名稱=="30 臺北市"|縣市名稱=="01 新北市")
+#%in%是屬於，所以可以把要的條件放在集合中
+filter(collegeData,
+       縣市名稱 %in% c("30 臺北市","01 新北市"))
+```
+
