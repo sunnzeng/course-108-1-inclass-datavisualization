@@ -1,6 +1,6 @@
 ---
-title: "課堂練習.Rmd"
-output: html_notebook
+title: "課堂練習"
+output: html_document
 ---
 ```{r}
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
@@ -60,26 +60,28 @@ head(StuDF)
 tail(StuDF)
 ```
 
+####dplyr
 ```{r}
 library(dplyr)
 ```
 
+###slice
 ```{r}
 StuDF
-slice(StuDF,1:3)
-slice(StuDF,4:5)
-slice(StuDF,n())
+slice(StuDF,1:3)%>% View
+slice(StuDF,4:5)%>% View
+slice(StuDF,n())%>% View
 ```
 
 #用slice顯示最後兩筆
 ```{r}
-slice(StuDF,7:8)
-slice(StuDF,n()-1:n())
+slice(StuDF,7:8)%>% View
+slice(StuDF,(n()-1):n())%>% View
 ```
 
 ```{r}
 StuDF
-slice(StuDF,-5:-7)#減掉五到七
+slice(StuDF,-5:-7)%>% View#減掉五到七
 ```
 
 ```{r}
@@ -97,12 +99,135 @@ slice(StuDF,c(-5,-6,-7))
 slice(StuDF,c(1,4,8))
 ```
 
+
+##政府開放平台:106學年大專院校校別學生數
 ```{r}
 library(readr)
 collegeData <- read_csv("https://raw.githubusercontent.com/tpemartin/github-data/master/103_student.csv")
 ```
-
+#檢查變數結構
 ```{r}
 str(collegeData)
+```
+#顯示前4筆，後3筆，中間第101到110筆。
+```{r}
+#顯示前4筆
+slice(collegeData,c(1:4))%>%View
+#後3筆
+slice(collegeData,c((n()-2)):n())%>%View
+#中間第101到110筆
+slice(collegeData,101:110)%>%View
+```
+
+
+###mutate：產生變數
+```{r}
+StuDF
+mutate(StuDF,
+       調分後成績=成績+10)->
+  StuDF #如果更動原dataframe記得要回存
+StuDF
+
+transmute(StuDF,
+       調分後成績=成績+10) # 只有新創，不保留其他變數
+```
+
+```{r}
+#基礎方式新增變數
+StuDF$調分後成績 <-
+  StuDF$成績+10
+
+#mutate的好處就是不用一直寫StuDF$
+```
+
+##在collegeData:
+
+新增變數男生及女生,其值為「一到四年級」所有男生及女生的加總。（男生使用dplyr, 女生不使用dplyr）
+
+新增變數男女生比，其值為前述男生/女生。
+
+```{r}
+collegeData
+#新增男生變數
+mutate(collegeData,
+       男生=一年級男生+二年級男生+三年級男生+四年級男生)->
+  collegeData
+#新增女生變數
+collegeData$女生<-
+  (collegeData$一年級女生+collegeData$二年級女生+collegeData$三年級女生+collegeData$四年級女生)
+#新增男女生比
+mutate(collegeData,
+       男女生比=男生/女生)->collegeData
+
+```
+
+```{r}
+#mutate一次可以創造很多變數
+mutate(collegeData,
+       男生=一年級男生+二年級男生+三年級男生+四年級男生,
+       女生=一年級女生+二年級女生+三年級女生+四年級女生,
+       男女生比=男生/女生)->
+  collegeData
+```
+
+### summarise：計算特徵值
+```{r}
+StuDF
+summarise(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+```
+##以上計算若把summarise改成mutate結果會如何？
+```{r}
+StuDF
+mutate(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+#每項都會出現平均成績最高分跟最低分
+```
+##若老師的調分為原始成績加上「最高最低分差距除以5」，請產生調分成績:
+```{r}
+mutate(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績),
+        調整後成績=成績+(最高分-最低分)/5)->
+  StuDF
+```
+
+### select：選擇變數
+```{r}
+StuDF
+mutate(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績)) -> StuDF2
+```
+
+```{r}
+StuDF2
+names(StuDF2)
+select(StuDF2,
+       姓名,學號,成績,調分後成績)
+select(StuDF2,
+       -次序,-性別,-最高分,-最低分)#不選
+```
+
+```{r}
+#select helpers
+select(StuDF2,
+       次序,性別,
+       contains("最"))#選次序性別跟有最的
+
+select(StuDF2,
+       -次序,-性別,
+       -contains("最"))
+```
+
+```{r}
+select(collegeData,
+       contains("男生"))
 ```
 
