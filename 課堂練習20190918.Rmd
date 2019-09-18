@@ -1,6 +1,6 @@
 ---
 title: "課堂練習.Rmd"
-output: html_document
+output: html_notebook
 ---
 ```{r}
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
@@ -31,10 +31,12 @@ StuDF <- data.frame(
   學號=c(172,214,322,425,517,833,752,114),
   姓名=c("小明","大雄","胖虎","小新","大白","阿華","小英","阿美"),
   性別=c("男","男","男","女","女","男","女","男"),
-  成績=c(80,42,90,82,50,
+  成績=c(80,42,90,82,50,77,30,90)
   )
+
 StuDF 
 ```
+
 
 ```{r}
 class(StuDF)#data.frame→可以玩什麼花樣
@@ -52,4 +54,55 @@ ncol(StuDF)#跟length(StuDF)是一樣的
 nrow(StuDF) # 從矩陣角度看 8
 ```
 
-str(StuDF)
+```{r}
+str(StuDF)#第一步是檢查
+head(StuDF)
+tail(StuDF)
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+StuDF
+slice(StuDF,1:3)
+slice(StuDF,4:5)
+slice(StuDF,n())
+```
+
+#用slice顯示最後兩筆
+```{r}
+slice(StuDF,7:8)
+slice(StuDF,n()-1:n())
+```
+
+```{r}
+StuDF
+slice(StuDF,-5:-7)#減掉五到七
+```
+
+```{r}
+5:7
+-(5:7)#不要五到七
+```
+
+```{r}
+slice(StuDF,-(5:7))
+slice(StuDF,c(-5,-6,-7))
+```
+
+#只要1.7.8
+```{r}
+slice(StuDF,c(1,4,8))
+```
+
+```{r}
+library(readr)
+collegeData <- read_csv("https://raw.githubusercontent.com/tpemartin/github-data/master/103_student.csv")
+```
+
+```{r}
+str(collegeData)
+```
+
