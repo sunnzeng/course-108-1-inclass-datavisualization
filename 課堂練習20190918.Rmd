@@ -299,3 +299,59 @@ filter(collegeData,
        縣市名稱 %in% c("30 臺北市","01 新北市"))
 ```
 
+### group_by：分群計算
+```{r}
+#group_by(data frame,分群變數)
+
+group_by(StuDF,
+         性別) -> StuDF_by性別
+
+# 使用grouped data frame
+summarise(StuDF_by性別,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+
+# 使用ungrouped data frame
+summarise(StuDF,
+        平均成績=mean(成績),
+        最高分=max(成績),
+        最低分=min(成績))
+
+#各加其群組之「最高減最低分除以5」
+mutate(
+  StuDF_by性別,
+  最高分=max(成績),
+  最低分=min(成績),
+  調分大小=(最高分-最低分)/5,
+  調分後成績=成績+調分大小
+) -> StuDF_依性別調分
+StuDF_依性別調分
+
+#依性別及成績是否大於75分：
+group_by(StuDF,
+         性別,
+         (成績>75)) -> StuDF_by性別成績
+
+summarise(StuDF_by性別成績,
+          平均成績=mean(成績),
+          人數=n())
+
+#ungroup
+ungroup(StuDF_依性別調分) -> 
+  StuDF_調分後
+```
+
+##算collegeData中不同縣市名稱及體系別的一年級男生及一年級女生總數（使用sum）和學校數目。
+
+```{r}
+group_by(collegeData,
+         縣市名稱,
+         體系別) -> collegeData_grouped
+summarise(collegeData_grouped,
+          一年級男生總數=sum(一年級男生),
+          一年級女生總數=sum(一年級女生),
+          學校數目=n())
+
+```
+
