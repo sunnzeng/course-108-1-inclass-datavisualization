@@ -12,3 +12,44 @@ knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.show
 
 ```
 
+```{r}
+StuList <- list(
+  次序=c(1,2,3,4,5,6,7,8),
+  學號=c(172,214,322,425,517,833,752,114),
+  姓名=c("小明","大雄","胖虎","小新","大白","阿華","小英","阿美"),
+  性別=c("男","男","男","女","女","男","女","男"),
+  成績=c(80,42,90,82,50,77,30,90)
+  )
+StuList 
+as.data.frame(StuList) -> StuDFfromList
+StuDFfromList
+```
+
+```{r}
+StuDF <- data.frame(
+  次序=c(1,2,3,4,5,6,7,8),
+  學號=c(172,214,322,425,517,833,752,114),
+  姓名=c("小明","大雄","胖虎","小新","大白","阿華","小英","阿美"),
+  性別=c("男","男","男","女","女","男","女","男"),
+  成績=c(80,42,90,82,50,
+  )
+StuDF 
+```
+
+```{r}
+class(StuDF)#data.frame→可以玩什麼花樣
+typeof(StuDF)#list 
+```
+
+```{r}
+class(StuList)#data.frame
+typeof(StuList)#list 
+```
+
+```{r}
+length(StuDF) # 從向量角度看 5
+ncol(StuDF)#跟length(StuDF)是一樣的
+nrow(StuDF) # 從矩陣角度看 8
+```
+
+str(StuDF)
