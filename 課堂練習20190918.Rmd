@@ -342,16 +342,19 @@ ungroup(StuDF_依性別調分) ->
   StuDF_調分後
 ```
 
-##算collegeData中不同縣市名稱及體系別的一年級男生及一年級女生總數（使用sum）和學校數目。
+##算collegeData中不同縣市名稱及體系別及等級別的一年級男生及一年級女生總數（使用sum）和學校數目。
 
 ```{r}
 group_by(collegeData,
          縣市名稱,
-         體系別) -> collegeData_grouped
+         體系別,
+         等級別) -> collegeData_grouped
 summarise(collegeData_grouped,
           一年級男生總數=sum(一年級男生),
           一年級女生總數=sum(一年級女生),
-          學校數目=n())
+          #學校數目=n()不適合，因為有不同學制，會重複計算
+          學校數目=length(unique(學校名稱)))#unique可以讓重複的不被計算
+
 
 ```
 
