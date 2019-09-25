@@ -63,5 +63,40 @@ df_taoyuanMarriageGather%>%
   summarise(
     總結婚對數=sum(對數)
   )->df_taoyuanMarriageGather_all
+#可以用mutate_at
 ```
 #找出每個地區結婚最高峰月份。
+
+##spread
+```{r}
+df_spreadExample <- data.frame(
+  id = c(1,1,1,2,2,2),
+  var = c("花朶萼片長度", "學名", "總類數"),
+  value = c(5.1, "setosa", 1, 
+            7.0, "versicolor", 2))
+```
+
+```{r}
+df_spreadExample
+spread(df_spreadExample,
+       var,value)->df_spreadExample_spread
+```
+
+```{r}
+collegeDataGather %>%
+  spread(
+    類別,人數
+  )->collegeDataGather_spread
+```
+
+```{r}
+df_twbankExchangeRate <- read_csv("http://www.bot.com.tw/Govinfo/opendata/csv/151/20180101-20181231-FXCRT.csv")
+```
+```{r}
+df_twbankExchangeRate%>%
+  select(-即期賣出匯率)%>%
+  spread(
+    幣別,即期買入匯率
+  )->df_twbankExchangeRate_spread
+```
+
