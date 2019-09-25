@@ -233,3 +233,73 @@ subsetDataTWbank_gather %>%
   )
 ```
 
+```{r}
+subsetDataTWbank%>%
+  ggplot()+
+  geom_line(
+    aes(x=西元年月,y=`定存利率-一個月-固定`),
+    color="red",
+    alpha=0.2, 
+    size=2
+  )
+#color可以用文字描述
+#alpha通透度,連續變數，不能用在間斷資料
+#size粗細
+```
+####字串變數
+###查看目前levels出現順序：
+```{r}
+subsetDataTWbank_gather$定存類型 %>% 
+  as.factor %>% levels
+```
+###改變levels出現順序：
+```{r}
+subsetDataTWbank_gather %>%
+  mutate(
+    定存類型=factor(定存類型,levels=c("定存利率-一個月-固定","定存利率-二年期-固定","定存利率-三年期-固定"))
+  ) -> subsetDataTWbank_gather
+
+subsetDataTWbank_gather %>%
+  ggplot()+
+  geom_boxplot(aes(x=定存類型,y=利率))
+```
+###時間資料
+```{r}
+twCalendar <- c("民國88年11月1日","民國88年12月1日","民國89年1月1日")
+```
+##民國轉成西元
+```{r}
+twCalendar %>%
+  # 取出字串中的數字部份
+  stringr::str_extract_all("[:digit:]+") %>%
+  # 將每個日期的「年」數字加上1991再合併年月日成為`yyyy-mm-dd`格式
+  purrr::map_chr(
+             function(x) {
+               x1=as.integer(x[[1]])+1911
+               x[[1]]=as.character(x1)
+               stringr::str_c(x,collapse="-")
+             }
+             ) -> westernCalendar
+
+westernCalendar %>%
+  lubridate::ymd() -> datetimeCalendar
+class(datetimeCalendar)
+```
+
+```{r}
+subsetDataTWbank %>%
+  mutate(
+    年月=年月 %>%
+      stringr::str_extract_all("[:digit:]+") %>% # 取出字串中的數字部份
+      purrr::map_chr(
+                 function(x) {
+                   x1=as.integer(x[[1]])+1911# 將每個日期的「年」數字加上1991
+                   x[[1]]=as.character(x1)
+                                stringr::str_c(x,collapse="-")#將年月連接
+                 }
+                 ),
+    年月日=stringr::str_c(年月,"01",sep="-"),#加上日
+    西元年月日=lubridate::ymd(年月日)
+  )
+```
+
