@@ -1,4 +1,10 @@
 ---
+title: '1002'
+author: "Sunny"
+date: "2019/10/2"
+output: html_document
+---
+---
 title: "課堂練習"
 author: "曾雨晴"
 date: "10/02/2019"
@@ -12,3 +18,17 @@ showtext_auto(enable=TRUE) #啟用字體
 theme_set(theme_classic())
 knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
 ```
+
+```{r}
+dq_download_csv <- read_csv("https://quality.data.gov.tw/dq_download_csv.php?nid=9819&md5_url=3a416c302acd2f7afbc12e43da1625c9")
+```
+
+```{r}
+dq_download_csv%>%
+  mutate(
+    `滿意（%）`=as.double(`滿意（%）`),
+    `普通（%）`=as.double(`普通（%）`)
+  )
+dq_download_csv
+```
+

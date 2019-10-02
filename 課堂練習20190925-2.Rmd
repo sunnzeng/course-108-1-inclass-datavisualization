@@ -22,6 +22,7 @@ df_gatherExample <- data.frame(
   `2000`=c("2k","80k","213k"),
   check.names = F
 )
+
 df_gatherExample
 ```
 ##將collegeData裡各年級男女生人數合成兩個欄位，類別,人數，其中類別值為原始欄位名稱（即一年級男生，一年級女生，…等等），而人數則為對應人數。
