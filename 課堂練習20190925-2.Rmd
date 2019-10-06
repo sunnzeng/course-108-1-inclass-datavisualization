@@ -30,7 +30,7 @@ df_gatherExample
 df_gatherExample
 gather(df_gatherExample,
        `1999`,`2000`,
-       key="年份",value="人口")
+       key="年份",value="人口")->df_gatherExample
 ```
 
 ```{r}
