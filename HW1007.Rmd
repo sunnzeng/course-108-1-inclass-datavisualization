@@ -39,8 +39,6 @@ knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.show
 library(readr)
 exchangeData <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4741/03e37384-89d5-443f-9915-5735748e280c.csv", locale = locale(encoding = "BIG5"))
 
-save(exchangeData,file = "uploadfile.Rda")
-load("uploadfile.Rda")
 graphDate<-list()
 
 exchangeData%>%
