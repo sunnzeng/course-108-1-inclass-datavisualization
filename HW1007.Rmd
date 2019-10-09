@@ -39,7 +39,7 @@ knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.show
 library(readr)
 exchangeData <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4741/03e37384-89d5-443f-9915-5735748e280c.csv", locale = locale(encoding = "BIG5"))
 
-graphDate<-list()
+graphData<-list()
 
 exchangeData%>%
   mutate(
@@ -59,21 +59,18 @@ exchangeData%>%
     key="類別",value="人數"
   )%>%
   group_by(`進修交流國家(地區)區域別`)%>%
-  summarise(人數=sum(人數))->graphDate$exchangeData
+  summarise(人數=sum(人數))->graphData$exchangeData
 ```
 
 #### 繪圖程式
 
 ```{r graph, echo=T, eval=T}
-graphDate$exchangeData%>%
+graphData$exchangeData%>%
 ggplot()+
   geom_col(
   aes(x=`進修交流國家(地區)區域別`,y=人數)
   )->finalplot
 finalplot
-
-finalplot%>%
-  ggplotly()
 ```
 
 #### 設計說明
@@ -81,3 +78,10 @@ finalplot%>%
 *** 
 此圖為民國105年到106年，全國大學(含)以上的學生，到各個地區交流的人數。可以看出大部分學生去交流仍以亞洲地區(包含大陸地區、其他亞洲地區、東協、港澳、南亞)為主，其次為歐洲。而亞洲地區又可比較出，其他亞洲地區人數最多，像是日本、韓國等等，其次是大陸地區，第三名則是東協地區。
 而選用長條圖是因為希望可以展現出數量上的明顯差異。
+
+
+```{r}
+finalplot%>%
+  ggplotly()
+```
+
