@@ -37,28 +37,46 @@ knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.show
   
 ```{r data cleaning, echo=TRUE, eval=T}
 library(readr)
-X106_1_2_10 <- read_csv("http://stats.moe.gov.tw/files/investigate/high_graduate/106/106_1_2_10.csv",locale = locale())
+cigaretteRate<- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1JB2eNShp5I4TgF_GMtz_GbKbWiNCpSAU")
+cigaretteRate%>%
+  slice(c(7:12))%>%
+  gather(contains("吸菸率"),
+         key="吸菸率類型",value="比率")->cigaretteRate_gather
+Year<-cigaretteRate_gather$吸菸率類型%>%
+  str_split("年")
+
+cigaretteRate_gather%>%
+  mutate(
+    年=Year[[ ]][[1]]
+  )
+
+
+cigaretteRate_gather%>%
+  mutate(
+    教育別=str_sub(分析項目,5,),
+    分析項目=as.factor(分析項目),
+    吸菸率類型=as.factor(吸菸率類型),
+    比率=as.numeric(比率))->cigaretteRate_gather
+```
+
+```{r}
+library(readr)
+loan<- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4764/a27e7193-392e-4780-9133-f27d3a65c791.csv", locale = locale(encoding = "BIG5"))
 
 library(readr)
-X2c8ac6c9_50c8_445e_86b8_df9364b4a0ec <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4736/2c8ac6c9-50c8-445e-86b8-df9364b4a0ec.csv",locale = locale(encoding = "BIG5"))
+unenployment<- read_csv("https://apiservice.mol.gov.tw/OdService/download/A17000000J-030145-VQ3")
 
 library(readr)
-X42ea3e8d_21a7_4cd3_b40b_4ea42e01a989 <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4739/42ea3e8d-21a7-4cd3-b40b-4ea42e01a989.csv", locale = locale(encoding = "BIG5"))
+cancer<- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I", locale = locale(encoding = "BIG5"))
 
-library(readr)
-a27e7193_392e_4780_9133_f27d3a65c791 <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4764/a27e7193-392e-4780-9133-f27d3a65c791.csv", locale = locale(encoding = "BIG5"))
-
-library(readr)
-DownloadFile <- read_csv("http://data.moi.gov.tw/MoiOD/System/DownloadFile.aspx?DATA=F9E0CFFE-6FAB-47AA-9821-43520EF463C6")
-
-library(readr)
-uc_export_download_confirm_jeak_id_1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I <- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I", locale = locale(encoding = "BIG5"))
 ```
 
 #### 繪圖程式
 
 ```{r graph, echo=T, eval=T}
-
+cigaretteRate_gather%>%
+  ggplot(aes(x=吸菸率類型,y=比率))+
+  geom_line()
 ```
 
 #### 設計說明
