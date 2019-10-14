@@ -1,0 +1,68 @@
+---
+title: "每週一圖作業"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+
+此部份在做：
+
+  * 原始Rda資料引入（即引入**dataList**物件）；
+  
+  * 資料清理成作圖用graphData物件。
+
+請將你最原始的資料連同作業一起上傳到作業上傳網址：  
+  * 若「原始資料為網頁下載」，且下載指令寫在data cleaning chunk裡的話，可以不用上傳「資料」。  
+  * 若原始資料有很多個檔案，請先引入成data frame並存在「一個」.Rda檔裡上傳（如`example_data.Rda`檔）。  
+
+資料檔引入到進入作圖前的資料處理請寫在下面區塊，分二部份：
+
+  * 資料處理  
+  * 作圖用資料物件生成
+  
+```{r data cleaning, echo=TRUE, eval=T}
+library(readr)
+X106_1_2_10 <- read_csv("http://stats.moe.gov.tw/files/investigate/high_graduate/106/106_1_2_10.csv",locale = locale())
+
+library(readr)
+X2c8ac6c9_50c8_445e_86b8_df9364b4a0ec <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4736/2c8ac6c9-50c8-445e-86b8-df9364b4a0ec.csv",locale = locale(encoding = "BIG5"))
+
+library(readr)
+X42ea3e8d_21a7_4cd3_b40b_4ea42e01a989 <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4739/42ea3e8d-21a7-4cd3-b40b-4ea42e01a989.csv", locale = locale(encoding = "BIG5"))
+
+library(readr)
+a27e7193_392e_4780_9133_f27d3a65c791 <- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4764/a27e7193-392e-4780-9133-f27d3a65c791.csv", locale = locale(encoding = "BIG5"))
+
+library(readr)
+DownloadFile <- read_csv("http://data.moi.gov.tw/MoiOD/System/DownloadFile.aspx?DATA=F9E0CFFE-6FAB-47AA-9821-43520EF463C6")
+
+library(readr)
+uc_export_download_confirm_jeak_id_1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I <- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I", locale = locale(encoding = "BIG5"))
+```
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
+*** 
+
+
