@@ -38,49 +38,43 @@ knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.show
 ```{r data cleaning, echo=TRUE, eval=T}
 library(readr)
 cigaretteRate<- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1JB2eNShp5I4TgF_GMtz_GbKbWiNCpSAU")
+graphData<-list()
 cigaretteRate%>%
   slice(c(7:12))%>%
   gather(contains("吸菸率"),
          key="吸菸率類型",value="比率")->cigaretteRate_gather
-Year<-cigaretteRate_gather$吸菸率類型%>%
-  str_split("年")
-
+Year=c("93","93","93","93","93","93","94","94","94","94","94","94","95","95","95","95","95","95","96","96","96","96","96","96","97","97","97","97","97","97","98","98","98","98","98","98","99","99","99","99","99","99","100","100","100","100","100","100","101","101","101","101","101","101","102","102","102","102","102","102","103","103","103","103","103","103","104","104","104","104","104","104","105","105","105","105","105","105")
 cigaretteRate_gather%>%
-  mutate(
-    年=Year[[ ]][[1]]
-  )
-
-
-cigaretteRate_gather%>%
+  slice(c(1:78))%>%
   mutate(
     教育別=str_sub(分析項目,5,),
     分析項目=as.factor(分析項目),
-    吸菸率類型=as.factor(吸菸率類型),
-    比率=as.numeric(比率))->cigaretteRate_gather
-```
-
-```{r}
-library(readr)
-loan<- read_csv("https://ws.moe.edu.tw/001/Upload/4/relfile/0/4764/a27e7193-392e-4780-9133-f27d3a65c791.csv", locale = locale(encoding = "BIG5"))
-
-library(readr)
-unenployment<- read_csv("https://apiservice.mol.gov.tw/OdService/download/A17000000J-030145-VQ3")
-
-library(readr)
-cancer<- read_csv("https://drive.google.com/uc?export=download&confirm=jeak&id=1jiPk0JTDETXBM_Fc7Iwuzs11OIDS12_I", locale = locale(encoding = "BIG5"))
-
+    比率=as.numeric(比率),
+    年=as.integer(Year)+1911)->graphData$cigaretteRate
 ```
 
 #### 繪圖程式
 
 ```{r graph, echo=T, eval=T}
-cigaretteRate_gather%>%
-  ggplot(aes(x=吸菸率類型,y=比率))+
-  geom_line()
+library(scales)
+library(colorspace)
+library(shiny)
+library(shinyjs)
+colorspace::sequential_hcl(n = 7, h = c(0, -100), c = c(80, NA, 40), l = c(40, 75), power = c(1, 1), register = "Palette1")
+graphData$cigaretteRate%>%
+  ggplot(aes(x=年,y=比率,color=教育別))+
+  geom_line(aes(linetype=教育別))+
+   scale_linetype_manual(
+    values=c("15","24","34","51","71","1242"))+
+  labs(title = "2004年到2016年每日抽菸率(以教育別劃分)",
+       caption = "資料來源: 臺灣政府資料開放平臺")+
+  scale_color_discrete_sequential(palette = "Palette1")->finalplot
+finalplot
 ```
 
 #### 設計說明
 說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
 *** 
-
+透過這張圖，可以看出大學、小學及以下、研究所以上、高中高職皆有下降的趨勢。也可以看出抽菸率最高的集中在國中階段，反而研究所或以上是抽菸率最低的。
+用線圖是因為可以看出2004年到2016年的變化，也可以看出每個教育別之間的差別。
 
