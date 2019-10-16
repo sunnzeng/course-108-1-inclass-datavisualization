@@ -371,7 +371,7 @@ df_x %>%
   geom_col(
     aes(y=interval_count)
   )
-
+#缺點是連續資料被切割成有縫隙
 #stat(prop)
 ```
 ####geom_histogram
@@ -379,5 +379,72 @@ df_x %>%
 df_x %>%
   ggplot(aes(x=x))+
   geom_histogram(bins=8)
+
+#bin要記得設定，不然就是30個
+
+df_x %>%
+  ggplot(aes(x=x))+
+  geom_histogram(bins=500)
+#bin不能設定太大
 ```
+####optimal bins
+```{r}
+optimBins <- grDevices::nclass.FD(df_x$x)
+optimBins
+```
+```{r}
+df_x %>%
+  ggplot(aes(x=x))+
+  geom_histogram(bins=optimBins)
+```
+
+```{r}
+df_x%>%
+  ggplot()+
+  geom_density(
+    aes(x=x)
+  )
+#可能會扭曲資料
+```
+#####stat function
+####count 
+```{r}
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院),
+    fill="#5A99B3", width=0.7
+  )
+
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院),
+    stat="count",
+    fill="#5A99B3", width=0.7
+  )
+
+graphList$圖書_ggplotOnly +
+  stat_count(
+    aes(x=學院),
+    geom="bar",# 使用資料 x=學院 進行count計算，並畫bar
+    fill="#5A99B3", width=0.7
+  )
+```
+
+####prop算占比
+```{r}
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院,y=stat(prop)),
+    fill="#5A99B3", width=0.7
+  )
+
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院,
+        y=stat(prop),
+        group="全校"),
+    fill="#5A99B3", width=0.7
+  )
+```
+
 
