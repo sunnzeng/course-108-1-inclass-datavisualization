@@ -447,4 +447,4 @@ graphList$圖書_ggplotOnly+
   )
 ```
 
-
+###stat_summary
