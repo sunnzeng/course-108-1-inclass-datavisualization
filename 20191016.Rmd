@@ -118,7 +118,7 @@ startSalaryTopCat<- read_csv("https://raw.githubusercontent.com/tpemartin/github
 
 startSalaryTopCat$大職業別[2:7] %>% str_c(.,collapse="','")
 ```
-
+####geom_col
 ```{r}
 startSalaryTopCat %>% filter(
   大職業別 %in% c('工業部門','礦業及土石採取業','製造業','電力及燃氣供應業','用水供應及污染整治業','營造業')
@@ -228,5 +228,156 @@ graphList$經常薪資_x有排序ed_ggplotOnly+
   graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0  
 
 graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0
+```
+##字轉45度
+```{r}
+graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0 +
+  theme(
+    axis.text.x=element_text(angle=45)
+    )
+```
+##字轉45度，水平調整為1
+```{r}
+graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0 +
+  theme(
+    axis.text.x=element_text(angle=45, hjust=1)
+    ) -> graphList$經常薪資_x有排序_scalLimits_Width_asp_textAdj_col0
+
+graphList$經常薪資_x有排序_scalLimits_Width_asp_textAdj_col0
+```
+##座標旋轉coord_flip
+```{r}
+graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0 +
+  coord_flip() -> graphList$經常薪資_x有排序_sclLimits_width_asp_flip_col0
+
+graphList$經常薪資_x有排序_sclLimits_width_asp_flip_col0
+```
+```{r}
+graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0 +
+  geom_text(
+    data = graphList$經常薪資_x有排序_scalLimits_gmWidth_asp1_col0,
+    aes(x=大職業別ordered,y=`經常性薪資-薪資`,label=`經常性薪資-薪資`),
+    color="#5A99B3",nudge_y=-5000)+
+    coord_flip()-> graphList$經常薪資_x有排序_sclLimits_width_asp_flip_col0_1
+
+graphList$經常薪資_x有排序_sclLimits_width_asp_flip_col0_1
+```
+
+
+####geom_bar
+```{r}
+library(readr)
+library100_102 <- read_csv("https://www.dropbox.com/s/wuo5o6l55lk68l6/library100_102.csv?dl=1")
+```
+
+```{r}
+library100_102 %>%
+  mutate(
+    借閱日期=date(ymd_hms(借閱時間)),
+    借閱年=year(借閱日期)
+  ) -> library100_102
+
+library100_102 %>%
+  filter(
+    借閱日期 %>% between(ymd("2014-09-01"),ymd("2015-06-30"))
+  ) -> library2014  
+
+library2014 %>%
+  group_by(學號) %>%
+  summarise(
+    學院=last(學院),
+    讀者年級=max(讀者年級)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    讀者年級=as.factor(讀者年級)
+    )-> library2014 
+```
+
+```{r}
+library100_102 %>%
+  mutate(
+    借閱日期=date(ymd_hms(借閱時間)),
+    借閱年=year(借閱日期)
+  ) -> library100_102
+
+library100_102 %>%
+  filter(
+    借閱日期 %>% between(ymd("2014-09-01"),ymd("2015-06-30"))
+  ) -> library2014  
+
+library2014 %>%
+  group_by(學號) %>%
+  summarise(
+    學院=last(學院),
+    讀者年級=max(讀者年級)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    讀者年級=as.factor(讀者年級)
+    )-> library2014 
+```
+
+```{r}
+library2014 %>%
+  mutate(
+    學院=reorder(學院,學號,length,order=T)
+  ) -> library2014
+
+library2014 %>% 
+  ggplot()-> graphList$圖書_ggplotOnly
+
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院), fill="#5A99B3", width=0.7
+    )
+```
+
+```{r}
+graphList$圖書_ggplotOnly +
+  geom_bar(
+    aes(x=學院,fill=as.factor(讀者年級)), width=0.7
+  )
+```
+####連續變數
+```{r}
+set.seed(2019)
+x <- rnorm(100)
+head(x)
+```
+
+```{r}
+ggplot2::cut_interval(x,n=8) -> x_interval#是個factor
+levels(x_interval)
+
+#cut_interval可以用於切割連續資料
+
+head(x_interval)
+```
+
+```{r}
+df_x <- data.frame(
+  x=x,
+  x_interval=x_interval
+)
+
+df_x %>%
+  group_by(x_interval) %>%
+  summarise(
+    interval_count=n()
+  ) %>%
+  ungroup() %>% #View
+  ggplot(aes(x=x_interval))+
+  geom_col(
+    aes(y=interval_count)
+  )
+
+#stat(prop)
+```
+####geom_histogram
+```{r}
+df_x %>%
+  ggplot(aes(x=x))+
+  geom_histogram(bins=8)
 ```
 
