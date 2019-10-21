@@ -1,0 +1,83 @@
+---
+title: "每週一圖作業"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+
+此部份在做：
+
+  * 原始Rda資料引入（即引入**dataList**物件）；
+  
+  * 資料清理成作圖用graphData物件。
+
+請將你最原始的資料連同作業一起上傳到作業上傳網址：  
+  * 若「原始資料為網頁下載」，且下載指令寫在data cleaning chunk裡的話，可以不用上傳「資料」。  
+  * 若原始資料有很多個檔案，請先引入成data frame並存在「一個」.Rda檔裡上傳（如`example_data.Rda`檔）。  
+
+資料檔引入到進入作圖前的資料處理請寫在下面區塊，分二部份：
+
+  * 資料處理  
+  * 作圖用資料物件生成
+  
+```{r data cleaning, echo=TRUE, eval=T}
+library(readr)
+Dengue_Daily_last12m <- read_csv("https://od.cdc.gov.tw/eic/Dengue_Daily_last12m.csv")
+
+graphData<-list()
+
+Dengue_Daily_last12m%>%
+  mutate(確定病例數=as.numeric(確定病例數),
+         居住縣市=as.factor(居住縣市),
+         年月=str_sub(Dengue_Daily_last12m$個案研判日,1,7))%>%
+  group_by(年月,居住縣市)%>%
+  summarise(人數=sum(確定病例數))%>%
+  ungroup()->graphData$Dengue_Daily_last12m_1
+```
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+library(scales)
+library(colorspace)
+library(shiny)
+library(shinyjs)
+
+colorspace::sequential_hcl(n = 8, h = c(0, 35), c = c(65, 100, 5), l = c(20, 97), power = c(0.05, 1.45), register = "Palette4")
+
+graphData$Dengue_Daily_last12m_1%>%
+  ggplot()+
+  geom_raster(aes(x=年月,y=居住縣市,fill=人數,hjust=1,vjust=10))+
+  scale_fill_continuous_sequential(palette = "Palette4",breaks=c(1,5,10,15,20,25,30))+
+  theme(axis.text.x = element_text(angle = 45,hjust = 1),
+        plot.background = element_rect(fill = "#F1F1F1",colour="black",size = 1),
+        legend.box.background = element_rect(),
+        legend.box.margin = margin(6,6,6,6))+
+  coord_flip()+
+  labs(title = "登革熱近12個月每月確定病例人數",
+       caption= "資料來源: 臺灣政府資料開放平臺")->finalplot
+finalplot
+  
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***之後
+*** 
+
+從圖中可以看出登革熱確定病例人數最高出現在高雄市，時間是2019年6月。第二高仍出現在高雄市，時間是2019年7月。第三高則是出現在台中市，時間是2018年10月。
+分別從X軸跟Y軸去看，X軸可以看出台中市、台北市、台南市、桃園市、高雄市、新北市為主要登革熱病例發生處，大多集中在都市；Y軸可以看出登革熱的疫情大多集中在6月到11月(集中夏季到秋季)。由此可以看出人口越密集，天氣較悶熱潮濕時，登革熱疫情較為嚴重。
