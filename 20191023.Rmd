@@ -101,5 +101,17 @@ graphList$圖書_ggplotOnly +
     aes(x=學院,y=stat(prop)), 
     geom="bar" # geom_bar內訂會取 count來當y
   )
+
+#設定大家同group
+graphList$圖書_ggplotOnly +
+  stat_count(
+    aes(x=學院,y=stat(prop),group="全校"), 
+    geom="bar" # geom_bar內訂會取 count來當y
+  )
+
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院,y=stat(prop),group="全校") # 預設 stat="count"
+  )
 ```
 
