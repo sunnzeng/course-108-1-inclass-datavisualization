@@ -114,4 +114,145 @@ graphList$圖書_ggplotOnly+
     aes(x=學院,y=stat(prop),group="全校") # 預設 stat="count"
   )
 ```
+##override geom
+```{r}
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院,y=stat(prop),group="全校",stat="count") # 預設 stat="count"
+  )+
+  stat_count(
+    aes(x=學院,y=stat(prop),group="全校",label=round(stat(prop),2)),
+    geom="text"
+  )
+#geom_bar+stat_count兩層圖
+```
+##override stat
+```{r}
+graphList$圖書_ggplotOnly+
+  geom_bar(
+    aes(x=學院,y=stat(prop),group="全校",stat="count") # 預設 stat="count"
+  )+
+  geom_text(
+    aes(x=學院,y=stat(prop),group="全校",stat="count",label=round(stat(prop),2)),
+    stat="count"
+  )
+```
+
+```{r}
+graphList$圖書_ggplotOnly +
+  geom_bar(
+    aes(x=學院)
+  )+
+  stat_count(
+    aes(x=學院,y=stat(count),label=stat(count)), geom="text"
+  )
+```
+##自創stat function
+#常態分配
+```{r}
+df_x <- data.frame(
+  x=rnorm(500,mean=2,sd=1)
+)
+df_x
+```
+
+```{r}
+df_x%>%
+  ggplot()+
+  geom_histogram(
+    aes(x=x,y=stat(density)
+  ))
+  
+
+df_x %>%
+  ggplot(aes(x=x))+
+  geom_histogram(
+    aes(y=stat(density))
+  )+
+  stat_function(
+    fun=dnorm, args = list(mean=2, sd=1) # dnorm 為常態分配density函數(r有的)
+  )
+```
+#市場供需
+```{r}
+market_demand <- function(x, a=1, b=-1){
+  return(a+b*x)
+}
+
+market_supply <- function(x, a=0, b=1){
+  return(a+b*x)
+}
+
+df_grids <- 
+  data.frame(
+    x=seq(0,1,by=0.2))#定義X從哪裡到哪裡
+
+df_grids %>%
+  ggplot(aes(x=x))+
+  stat_function(
+    fun="market_demand"
+  )+
+  stat_function(
+    fun="market_supply"
+  )+
+  scale_y_continuous(
+    limits = c(0,1)
+  )+
+  labs(
+    x="Quantity", y="Price"
+  ) -> graphList$demand_supply
+
+graphList$demand_supply
+
+graphList$demand_supply+
+  stat_function(
+    fun="market_demand",
+    args=list(b=-2), color='red'
+  )
+
+```
+
+##stat_summary
+```{r}
+df0<-data.frame(
+      x=seq(0.25,0.5,by=0.01),
+      y=seq(0.25,0.5,by=0.01)
+    )
+
+df0%>%
+  ggplot(aes(x=x,y=y))+
+  stat_summary(
+    fun.ymin= function(y) market_demand(y),
+    fun.ymax= function(y) market_supply(y),
+    geom="ribbon"
+  )
+```
+
+```{r}
+graphList$demand_supply+
+  stat_summary(
+    data = df0,
+    aes(y=x),
+    fun.ymin = function(y) market_demand(y),
+    fun.ymax = function(y)market_supply(y),
+    geom = "ribbon",
+    alpha=0.3
+  )
+
+graphList$demand_supply+
+  geom_ribbon(
+    data=data.frame(
+      x=seq(0.25,0.5,by=0.01)
+    ),
+    aes(y=x),
+    stat="summary", 
+    fun.ymin= function(y) market_demand(y),
+    fun.ymax= function(y) market_supply(y),
+    alpha=0.3
+  )
+```
+##geom_ribbon
+```{r}
+
+```
 
