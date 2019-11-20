@@ -1,0 +1,72 @@
+---
+title: "每週一圖作業繪圖說明檔"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+# load("graphData.Rda") # 此行為第一行
+load("graphData.Rda")
+graphData$nearsightedStud%>%
+  ggplot( )+
+  geom_line(
+    aes(
+      x=graphData[["nearsightedStud"]][["年分"]],
+      y=graphData[["nearsightedStud"]][["總近視學生人數"]],
+      group=graphData[["nearsightedStud"]][["級別"]],
+      linetype=graphData[["nearsightedStud"]][["級別"]])) +
+  theme(legend.position = "none") +
+  annotate(
+    "text",x=2017.5,y=123000,label="國小六年級"
+  )+
+  annotate(
+    "text",x=2017.5,y=110000,label="國小五年級"	
+  )+
+  annotate(
+    "text",x=2017.5,y=92000,label="國小四年級"		
+  )+
+  annotate(
+    "text",x=2017.5,y=71000,label="國小三年級"	
+  )+
+  annotate(
+    "text",x=2017.5,y=55000,label="國小二年級"	
+  )+
+  annotate(
+    "text",x=2017.5,y=47000,label="國小一年級"		
+  )+
+  labs(
+    title = "臺灣2016年至2018年國小近視學生總數趨勢圖",
+    tag = "單位(人)",
+    caption = "資料來源：政府資料開放平台"
+  )+
+  xlab("年分")+
+  ylab("總近視學生人數")
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+
+*** 
+此圖展現2016年至2018年全台小學生各年級近視總人數變化趨勢，可以看出三到六年級皆有下降的趨勢，尤其三年級下降幅度最大；一年級室持續上升，且上升幅度大；二年級則是先下降再上升。
+
+因為想要展現各年級近視人數變化趨勢，所以希望透過折線圖，能較簡單清楚的看出每個年級的變化。
+

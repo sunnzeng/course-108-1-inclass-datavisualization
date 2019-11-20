@@ -1,0 +1,39 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework3/graphData_homework3_004.Rda?raw=true"))
+c('級別','年分','總近視學生人數')->names(graphData[[1]])
+
+graphData[["nearsightedStud"]][["級別"]]<-as.factor(graphData[["nearsightedStud"]][["級別"]])
+graphData[["nearsightedStud"]][["年分"]]<-as.numeric(graphData[["nearsightedStud"]][["年分"]])
+
+save(graphData,file="graphData.Rda")
+
+graphData$nearsightedStud%>%
+  ggplot()+
+  geom_line(x='年月',y='總近視學生人數')
+# save(<所有在graph_story.Rmd要用的物件列出來，中間用逗號分隔>, file="graphData.Rda") # 此行放在最後一行
+```
+

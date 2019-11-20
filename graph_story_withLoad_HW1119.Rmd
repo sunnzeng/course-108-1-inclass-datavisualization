@@ -1,0 +1,63 @@
+---
+title: "每週一圖作業繪圖說明檔"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+#### 繪圖程式
+
+```{r graph, echo=T, eval=T}
+# load("graphData.Rda") # 此行為第一行
+load("graphData.Rda")
+colorspace::sequential_hcl(n = 4, h = c(1, 37), c = c(67, NA, 32), l = c(57, 99), power = c(1, NA), register = "Palette")
+
+graphData$resume%>%
+  mutate(
+    能力=as.factor(能力)
+  )%>%
+  ggplot(aes(x=年份))+
+  geom_col(
+    aes(y=年資,fill=能力)
+  )+
+  labs(
+    title = "工作經驗累積能力",
+    subtitle = "從2012年至今",
+    caption = "https://www.cakeresume.com/resumes/eggboys1616"
+  )+
+  theme(
+    legend.title = element_blank(),
+    legend.position = "bottom"
+  )+
+  scale_y_continuous(position = "right",)+
+  scale_x_continuous(breaks = c(2012,2013,2014,2015,2016,2017,2018,2019))+
+  theme(
+    axis.title.y.right = element_text(angle = 0,vjust = 0.5)
+  )+
+  scale_fill_discrete_sequential(palette="Palette")
+```
+
+#### 設計說明
+說明想傳達的訊息（必要）及設計想法（非必要）。寫在***下一行。
+
+*** 
+
+此份履歷著重在說明自己在職業生涯中，因為各項工作而習得的能力，所以我將能力大致劃分為四種(參考履歷本人的劃分)，希望透過此圖，可以展現出此人從剛進職場到現在，除了維持前工作的所獲得的，也持續學習新的能力，並透過每年逐漸增加，展現出能力的維持及進步。
+
+參考履歷：https://www.cakeresume.com/resumes/eggboys1616

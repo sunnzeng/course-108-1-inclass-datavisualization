@@ -1,0 +1,329 @@
+---
+title: "20191030"
+author: "曾雨晴"
+date: "10/30/2019"
+output: html_document
+---
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+```{r}
+d <- ggplot(mtcars, aes(cyl, mpg)) + geom_point()
+d + stat_summary(fun.y = "median", colour = "red", size = 2, geom = "point")
+```
+
+```{r}
+d <- ggplot(diamonds, aes(carat, price))
+d + geom_point() 
+d + geom_hex(
+  aes(fill=stat(density))
+)
+```
+```{r}
+library(readr)
+library2014 <- read_csv("https://www.dropbox.com/s/999hy0u1y98y6ep/library2014.csv?dl=1")
+```
+
+
+```{r}
+graphList<-list()
+
+library2014 %>%
+  mutate(
+    讀者年級=as.factor(讀者年級)
+  )->library2014
+
+library2014%>%
+  ggplot(aes(x=學院,fill=讀者年級)) -> graphList$圖書_ggplotOnly_with_aes
+
+graphList$圖書_ggplotOnly_with_aes +
+  geom_bar() # 內定position="stack"
+
+
+graphList$圖書_ggplotOnly_with_aes +
+  geom_bar(
+    width=0.7, position = "dodge"
+  ) -> # fill類別較少的,width會放大
+  graphList$圖書_positionDodge
+
+graphList$圖書_positionDodge
+
+graphList$圖書_ggplotOnly_with_aes +
+  geom_bar(
+    width=0.7,
+    position=position_dodge(width=0.8,preserve = "single") # 0.7寬，0.8dodge創造0.1間隔
+  ) ->
+  graphList$圖書_positionDodge_preserve
+#single讓大家的寬都是一樣的
+graphList$圖書_positionDodge_preserve
+```
+
+####chapter5
+###5.1
+```{r}
+df0 <- data.frame(
+  x=c(1,2,1,3,2),
+  y=c(2,3,1,2,4),
+  label=c("a","b","c","d","e")
+)
+df0 %>%
+  ggplot(aes(x=x,y=y))+
+  geom_label(
+    aes(label=label), fill="pink"
+    )-> plotbase0
+
+list_graphs <- list()
+
+plotbase0+geom_line()+labs(title="geom_line") -> 
+  list_graphs$geom_line
+
+plotbase0+geom_path()+labs(title="geom_path") -> 
+  list_graphs$geom_path
+
+ggpubr::ggarrange(
+  list_graphs$geom_line, list_graphs$geom_path
+)
+```
+##5.1.1
+```{r}
+ggplot()+theme_linedraw()+
+  scale_x_continuous(limits=c(0,6),breaks=0:6,
+                     expand=expand_scale(add=c(0,0)))+#add是上下限要加多少空間
+  scale_y_continuous(limits=c(0,6),breaks=0:6,
+                     expand=expand_scale(mult = c(0,0))) ->#mult是上下限要加幾倍的空間
+  myGrids
+
+myGrids
+```
+##5.1.2
+```{r}
+list_geometryData <- list()
+list_geometryData$points <- 
+  rbind(
+    c(1,5),
+    c(2,1),
+    c(5,1),
+    c(5,5)) 
+```
+
+```{r}
+list_geometryData$points %>%
+  as.data.frame() 
+#如果沒有設定column名稱的話會自動稱為v1.v2
+```
+
+```{r}
+myGrids +
+  geom_point(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$point
+
+myGrids +
+  geom_path(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$path
+
+myGrids +
+  geom_polygon(
+    data=as.data.frame(list_geometryData$points),
+    aes(x=V1,y=V2)
+  ) -> list_graphs$polygon
+
+ggpubr::ggarrange(
+  list_graphs$point, list_graphs$path, list_graphs$polygon,
+  ncol=3
+)
+```
+
+```{r}
+library(readr)
+df_geo_northTW <- read_csv("https://www.dropbox.com/s/6uljw24zkyj7avs/df_geo_northTW.csv?dl=1")
+```
+
+```{r}
+newTaipei<-df_geo_northTW%>%filter(COUNTYNAME=="新北市")
+
+ggplot()+
+  geom_polygon(
+    data=newTaipei,
+    aes(x=x,y=y)
+  )->newTaipei_map
+newTaipei_map
+#裡面包含台北市
+newTaipei_map+theme_linedraw()
+```
+##5.1.4
+```{r}
+list_geometryData$hole <-
+  rbind(
+    c(2,4),
+    c(3,2),
+    c(4,3)
+  )
+
+list_graphs$twoPolygons <-
+  list_graphs$polygon+
+  geom_polygon(
+    data=as.data.frame(list_geometryData$hole),
+    aes(x=V1,y=V2), fill="white"
+  )
+
+ggpubr::ggarrange(
+  list_graphs$polygon, list_graphs$twoPolygons
+)
+```
+
+```{r}
+list_geometryData$points %>%
+  as.data.frame() -> df_part1
+list_geometryData$hole %>%
+  as.data.frame() -> df_part2
+
+df_part1 %>%
+  mutate(
+    sub_id=1
+  ) -> df_part1
+
+df_part2 %>%
+  mutate(
+    sub_id=2
+  ) -> df_part2
+
+bind_rows(
+  df_part1,
+  df_part2
+) -> df_all
+
+#sub_id可以區分外圈跟內圈
+df_all %>%
+  mutate(
+    group_id="A"
+  ) -> df_all
+df_all
+```
+
+```{r}
+myGrids +
+  geom_polygon(
+    data=df_all,
+    aes(x=V1,y=V2, group=group_id, subgroup=sub_id)
+  )
+```
+
+```{r}
+df_geo_northTW%>%
+  filter(COUNTYNAME %in% c("新北市","臺北市"))%>%
+  mutate(
+    group="1"
+  )->df_newTaipei
+
+df_newTaipei%>%
+  ggplot()+
+  geom_polygon(aes(x=x,y=y,group=group,subgroup=COUNTYNAME))
+```
+```{r}
+df_geo_northTW %>%
+  ggplot()+
+  geom_polygon(
+    aes(x=x,y=y,fill=COUNTYNAME), color="azure4"
+  ) -> list_graphs$northTW
+list_graphs$northTW
+```
+###5.2 annotation
+##5.2.1
+```{r}
+# load(url("https://www.dropbox.com/s/9n7b1bcs09gnw0r/ggplot_newTaipei.Rda?dl=1")) # 前個練習若沒做出來，執行此行
+
+list_graphs$northTW +
+#  theme_linedraw()+
+  geom_path(
+    data=data.frame(
+      x=c(121.55,121.7,121.9),
+      y=c(25.1,24.7,24.7)
+      ),
+    aes(x=x,y=y)
+    )+
+  annotate(
+    "text",
+    x=121.9,y=24.71,label="這是臺北市",
+    vjust=0#在0到1之間
+  )+
+  theme_void()
+```
+##5.2.2圖片
+```{r}
+library(magick)
+image_read("https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/2450df20386177.562ea7d13f396.jpg") -> taipei101
+taipei101
+taipei101 %>%
+  image_info() -> taipei101info
+taipei101info
+# 檢視圖片高寬比
+taipei101info$height/taipei101info$width -> img_asp # image aspect ratio
+img_asp
+```
+```{r}
+theme_linedraw()+
+  theme(
+    panel.background = element_rect(fill="cyan4")
+  ) -> list_graphs$theme_backgroundCheck
+
+# 圖片底色非透明
+taipei101 %>%
+  image_ggplot()+
+  list_graphs$theme_backgroundCheck
+```
+```{r}
+image_fill(taipei101, "transparent", point = "+100+100", fuzz = 0) %>% 
+  # fuzz=對邊界定義模糊度 %>%
+    image_ggplot()+list_graphs$theme_backgroundCheck
+
+image_fill(taipei101,"transparent", point = "+100+100", fuzz=20) %>%
+    image_ggplot()+list_graphs$theme_backgroundCheck
+
+image_fill(taipei101,"transparent", point = "+100+100", fuzz=30) %>%
+    image_ggplot()+list_graphs$theme_backgroundCheck
+
+image_fill(taipei101,"transparent", point = "+100+100", fuzz=40) %>%
+    image_ggplot()+list_graphs$theme_backgroundCheck
+```
+```{r}
+#轉成raster矩陣資料
+image_fill(taipei101,"transparent", point = "+100+100", fuzz=30) -> 
+  taipei101transparent
+
+taipei101transparent %>%
+  as.raster() ->
+  raster_taipei101
+```
+
+```{r}
+loc <- c(lon=121.5622782,lat=25.0339687) # Taipei101 經緯度
+imgWidth <- 0.13 # Taipei101在圖片佔寬
+
+list_graphs$northTW +
+  annotation_raster(raster_taipei101,
+                    loc[1]-imgWidth/2,loc[1]+imgWidth/2,
+                    loc[2]-imgWidth/2*img_asp,loc[2]+imgWidth/2*img_asp)
+```
+```{r}
+#調低解析度
+image_scale(taipei101transparent,"200") -> taipei101sm#把寬度合併成200
+taipei101sm %>% as.raster() -> raster_taipei101sm
+list_graphs$northTW +
+  annotation_raster(raster_taipei101sm,
+                    loc[1]-imgWidth/2,loc[1]+imgWidth/2,
+                    loc[2]-imgWidth/2*img_asp,loc[2]+imgWidth/2*img_asp) ->
+  list_graphs$northTW2
+
+list_graphs$northTW2
+```
+
