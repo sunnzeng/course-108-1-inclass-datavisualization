@@ -12,3 +12,175 @@ showtext_auto(enable=TRUE) #啟用字體
 theme_set(theme_classic())
 knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
 ```
+
+```{r}
+#library(clipr)#把複製直接貼進R
+#read_clip()->cv
+#cv
+```
+
+```{r}
+library(sf); library(osmdata); library(rmapshaper)
+```
+
+
+## 5.7
+
+### 5.7.1
+```{r}
+# 取出spData套件附的world data
+data(world,package="spData")
+class(world) # 已是sf object
+```
+
+```{r}
+# 目前CRS
+world %>% st_crs 
+```
+```{r}
+world %>% st_geometry() %>%
+  ggplot()+
+  geom_sf()->world_big
+```
+
+```{r}
+sf_taiwan=read_sf("mapdata201907311006/COUNTY_MOI_1080726.shp")
+```
+
+```{r}
+world %>% st_crs->crs_world
+```
+
+```{r}
+sf_taiwan%>%
+  st_transform(crs = crs_world)->sf_taiwan2
+```
+
+### 5.7.2
+
+```{r}
+load(url("https://www.dropbox.com/s/elnvocol0nnkcc9/sf_northTaiwan.Rda?dl=1"))
+```
+
+```{r}
+sf_northTaiwan %>%
+  st_centroid(of_largest_polygon = T) ->
+  sf_centroid_northTaiwan
+
+sf_centroid_northTaiwan
+```
+
+### 5.7.4
+
+```{r}
+world%>%
+  st_crop(xmin=119.5,xmax=125,ymax=25.5,ymin=20)->st_taiwan_small
+```
+```{r}
+st_taiwan_small%>%
+  ggplot()+geom_sf()
+```
+
+### 5.7.5
+
+##5.9
+
+```{r}
+sf_mrtStops_tpe=read_sf("mapdata201907050841/MARK_捷運車站_1080626.shp")
+```
+
+```{r}
+load(url("https://www.dropbox.com/s/uvco1te2kbs6o01/MRT_Taipei.Rda?dl=1"))
+```
+
+###5.9.1
+```{r}
+sf_mrtStops_tpe %>%
+  st_crs() -> sf_mrtStops_tpe_crs
+sf_mrtStops_tpe_crs
+```
+
+###5.9.2
+```{r}
+sf_mrtStops_tpe%>%
+  filter(
+    stringr::str_detect(經過路線,"BL")
+  )->
+  sf_mrtStops_tpe_bl
+sf_mrtStops_tpe_bl
+```
+```{r}
+sf_mrtStops_tpe_bl%>%
+  mutate(
+    站號=str_extract(經過路線,"(?<=(BL))[:digit:]+")
+  )%>%
+  arrange(站號)->sf_mrtStops_tpe_bl
+sf_mrtStops_tpe_bl
+  
+```
+```{r}
+sf_northTaiwan %>%
+  ggplot()+geom_sf()+
+  geom_sf(
+    data=sf_mrtStops_tpe_bl
+  )+
+  coord_sf(
+    xlim=c(121.4,121.7),
+    ylim=c(24.9,25.1)
+  ) -> gg_tpe_mrt
+gg_tpe_mrt
+```
+```{r}
+sf_mrtStops_tpe_bl%>%
+  st_coordinates()->bl_coords#取出座標
+
+gg_tpe_mrt+
+  geom_path(
+    data = data.frame(
+      x=bl_coords[,"X"],
+      y=bl_coords[,"Y"]
+    ),
+    aes(
+      x=x,y=y
+    )
+  )
+```
+```{r}
+#sf_northTaiwan%>%
+  #st_crop()
+
+
+#sf_mrtStops_tpe_bl%>%
+  #st_crop()
+```
+```{r}
+sf_mrtStops_tpe_bl%>%
+  st_coordinates()%>%#取出座標直接轉sf
+  st_linestring()->bl_line
+class(bl_line)
+
+bl_line%>%
+  st_sfc() -> sfc_bl_line
+
+class(sfc_bl_line)#sfc才能設座標系統
+```
+
+
+
+
+```{r}
+#作法二
+sf_northTaiwan%>% st_crs()->crs0
+
+sfc_bl_line%>%
+  st_set_crs(crs0)->
+```
+
+
+```{r}
+library(osmdata)
+```
+
+
+
+
