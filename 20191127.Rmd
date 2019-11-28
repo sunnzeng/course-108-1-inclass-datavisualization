@@ -1,0 +1,382 @@
+---
+title: "課堂練習"
+author: "曾雨晴"
+date: "11/27/2019"
+output: html_document
+---
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+##5.10 其他相關圖資套件
+###5.10.1 osmdata
+```{r}
+library(osmdata)
+```
+####5.10.1.1 網頁下載.osm
+```{r}
+st_layers("map.osm")->layers_map
+
+layers_map$geomtype[[2]]->sfc_linestring_osm
+```
+#####lines
+```{r}
+st_read("map.osm",layer="lines") -> sf_memorial_lines
+
+sf_memorial_lines%>%view()
+```
+
+```{r}
+sf_memorial_lines%>%
+  ggplot()+geom_sf()
+```
+
+```{r}
+sf_memorial_lines%>%
+  filter(
+    
+  )
+```
+
+#####points
+```{r}
+st_read("map.osm",layer = "points") ->sf_memorial_points
+
+sf_memorial_points%>%
+  ggplot()+geom_sf()
+```
+
+#####multipolygons
+```{r}
+st_read("map.osm",layer="multipolygons") -> sf_memorial_multipolygons
+
+sf_memorial_multipolygons%>%
+  ggplot()+geom_sf()->gg_memorial
+```
+
+#####multilinestrings
+```{r}
+st_read("map.osm",layer = "multilinestrings")->sf_memorial_multilinestrings
+
+sf_memorial_multilinestrings%>%
+  ggplot()+geom_sf()
+```
+
+#####國館的圖
+```{r}
+gg_memorial+
+  geom_sf(
+    data = sf_memorial_lines
+  )+
+  geom_sf(
+    data = sf_memorial_points
+  )
+```
+#####practice
+```{r}
+st_layers("map_dzsh.osm")
+st_read("map_dzsh.osm",layer = "multipolygons")->sf_dzsh_multipolygons
+sf_dzsh_multipolygons%>%
+  ggplot()+geom_sf()->gg_dzsh
+gg_dzsh
+st_read("map_dzsh.osm",layer = "lines")->sf_dzsh_lines
+st_read("map_dzsh.osm",layer = "other_relations")->sf_dzsh_other_relations
+
+gg_dzsh+
+  geom_sf(
+    data=sf_dzsh_other_relations
+  )+
+  geom_sf(
+    data = sf_dzsh_lines
+  )+
+  coord_sf(
+    xlim=c(121.539,121.544),
+    ylim = c(25.0775,25.0795)
+  )
+```
+####5.10.1.2 Overpass query
+
+#####practice
+```{r}
+library(osmdata)
+# open pass query with bounding box
+bbox_TPtrainStation <- opq(
+  bbox = c(121.51319,25.04595,121.52047,25.05028) 
+)
+```
+
+#####台北捷運路線圖
+```{r}
+library(osmdata)
+# open pass query with bounding box
+bbox_taipei <- opq(
+  bbox = c(121.4616,25.1050,121.6058,24.9894) 
+) 
+
+bbox_taipei %>% 
+  add_osm_feature(
+    key="railway", value="subway"
+  ) %>%
+  osmdata_sf() -> map_taipei_subway
+
+map_taipei_subway
+
+map_taipei_subway$osm_lines %>%
+  mutate(
+    length=st_length(geometry),
+    shortname=str_replace(name,"捷運","") %>%
+      str_extract("[:graph:]+(?=線)")
+  ) -> sf_tpe_mrt
+
+sf_tpe_mrt %>%
+  filter(
+    shortname=="板南"
+  ) %>%
+  st_geometry() -> sfc_BL
+sfc_BL %>% st_union() %>%
+  ggplot()+geom_sf()
+
+
+sf_tpe_mrt %>%
+group_by(
+    shortname
+  ) %>%
+  summarise(
+    geometry=st_union(geometry)
+  ) %>%
+  ungroup() %>%
+  na.omit() -> sf_tpe_mrt
+
+
+sf_tpe_mrt %>%
+  ggplot()+geom_sf(
+    aes(color=shortname, fill=shortname), size=1
+  ) +
+  geom_sf_text(
+    aes(label=shortname)
+  )+
+  labs(title="台北捷運路線圖")
+```
+#####行政區
+```{r}
+bbox_taipei %>%
+  add_osm_feature(
+    key="admin_level", value="5"
+  ) %>%
+  osmdata_sf() -> map_taipei_boundary
+
+map_taipei_boundary  
+
+map_taipei_boundary$osm_multipolygons -> map_taipei
+
+#map_taipei %>%
+#  ggplot()+
+#  geom_sf() 會有錯誤訊息
+
+map_taipei %>%
+  st_geometry() -> sfc_map_taipei
+for(i in seq_along(sfc_map_taipei)){
+  names(sfc_map_taipei[[i]][[1]]) <-
+    1:length(names(sfc_map_taipei[[i]][[1]]))
+}
+
+map_taipei %>%
+  st_set_geometry(
+    sfc_map_taipei
+  ) -> map_taipei2
+
+map_taipei2 %>%
+  ggplot()+
+  geom_sf()
+```
+##5.10.2 ggmap
+```{r}
+install.packages("ggmap")
+```
+#第 6 章 Guide, Facet and Theme
+##6.1 Guides (axes+legend)
+###6.1.1 Guides: axes
+####6.1.1.1 second axis: sec_axis()
+```{r}
+billionaire <- 
+  read_csv("https://www.dropbox.com/s/cpu4f09x3j78wqi/billionaire.csv?dl=1") %>%
+  rename(
+    "Year"="X1"
+  )
+
+billionaire
+
+billionaire %>%
+  ggplot()+geom_line(
+    aes(x=Year,y=Russia)
+  ) +
+  scale_y_continuous(
+    breaks=seq(0,200,by=50)
+  ) +
+  theme_linedraw()-> plot_russia
+
+billionaire %>%
+  ggplot()+geom_line(
+    aes(x=Year,y=World)
+  )+
+  scale_y_continuous(
+    breaks=seq(0,2000,by=500)
+  ) +
+  theme_linedraw()-> plot_world
+```
+
+```{r}
+f <- function(x) x/10
+f_inverse <- function(f_value) 10*f_value
+```
+
+```{r}
+billionaire%>%
+  mutate(
+    World2=f(World)
+  )->billionaire
+```
+
+```{r}
+billionaire %>%
+  ggplot()+
+  geom_line(
+    aes(x=Year,y=Russia), color="blue", size=2
+  ) +
+  geom_line(
+    aes(x=Year,y=World2), color="brown", size=2
+  ) + 
+  scale_y_continuous(
+    limits=c(-1,230),
+    breaks=seq(0,200,by=50),
+    expand=expand_scale(mult=c(0,0)),
+    sec.axis = sec_axis(  # 設定右Y軸
+      trans=f_inverse,
+      name="Rest of the World"
+    )
+  ) +
+  theme_bw() -> plot_sec_axis 
+
+plot_sec_axis
+```
+
+```{r}
+# 引入theme_dual_axis()
+source("https://www.dropbox.com/s/8sdedu4wnq8wsns/guides.R?dl=1")
+
+plot_sec_axis +
+  scale_x_continuous(
+    limits=c(1995,2015),
+    breaks=c(1996,seq(2000,2015,by=5)),
+    labels=function(x) ifelse(x<=2000,x,str_sub(as.character(x),3,4))
+  )+
+  labs(x="",y="Russia")+
+  theme_dual_axis()
+```
+
+####6.1.1.2 
+```{r}
+load(url("https://www.dropbox.com/s/r21jg0vxf77geu9/plot_tree.Rda?dl=1"))
+
+plot_tree
+```
+
+```{r}
+#下方再加一個x軸
+plot_tree +
+  scale_x_continuous(
+    sec.axis = dup_axis()
+  ) 
+```
+###6.2.1 範例
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework6/graphData_homework6_021.Rda?raw=true"))
+source("https://www.dropbox.com/s/0ydtqtxu5guy6i1/theme_lin.R?dl=1")
+
+resume_df %>% 
+  mutate(開始 = ymd(開始), 結束 = ymd(結束))  -> resume_df
+```
+
+```{r}
+resume_df %>%
+  ggplot(
+    aes(x = 開始, y = 項目)) +    
+  geom_text(
+    aes(label = 名稱), size = 2.5) + 
+  geom_segment(
+    aes(
+      xend = 結束, yend = 項目, color = 分類, size = 2, alpha = 1
+      )
+    ) +
+  scale_x_date(
+      breaks = seq(as.Date("2015-01-01"), as.Date("2020-01-01"), by="1 year"),
+      labels = scales::date_format("%Y")
+      )+
+  labs(title = "Kuo, Shih-Jung  郭士榮", subtitle = "熱愛挑戰不設限、豐富國際經驗、在學三份實習") + 
+  theme_lin() -> gg_basic
+
+gg_basic
+```
+
+```{r}
+gg_basic +
+  facet_grid(分類~.) -> gg_facet
+
+gg_facet
+```
+
+###6.2.2 Option: scales
+```{r}
+gg_basic +
+  facet_grid(分類~.,  scales = "free_y") -> gg_facet_free
+
+gg_facet_free
+```
+```{r}
+gg_facet_free +
+  theme(    
+    strip.background = element_rect(color = "gray", fill = "#F6F4E8")
+    ) 
+```
+
+###6.2.3 範例
+```{r}
+load(url("https://github.com/tpemartin/course-108-1-inclass-datavisualization/blob/master/%E4%BD%9C%E5%93%81%E5%B1%95%E7%A4%BA/homework3/graphData_homework3_002.Rda?raw=true"))
+
+graphData$sub_2015_city%>%
+  arrange(desc(area), avg_nh)%>%
+  mutate(city = forcats::fct_inorder(city)) -> df_eldercare
+```
+
+```{r}
+df_eldercare %>%
+  ggplot(
+    aes(y = avg_nh, x = city, fill = area)
+    )+
+  geom_col(
+    width=0.7
+  )+
+  coord_flip()+
+  labs(x = "長照機構數(每10,000位老人)", y="")+
+  theme_lin() -> gg_original
+
+gg_original
+
+gg_original+
+  facet_grid(
+    rows=vars(area), scales="free_y"
+  )#scale的free是把每類中不需要的清除
+
+gg_original+
+  facet_grid(
+    rows=vars(area), scales="free_y", space="free_y"
+  )#space的free是把每類中的各項面積都一樣
+```
+
+#第 7 章 Web application
+##7.3 flexdashboard
