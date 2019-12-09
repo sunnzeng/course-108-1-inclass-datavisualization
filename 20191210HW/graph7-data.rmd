@@ -1,0 +1,377 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["彭亦楓","李靜怡","鄭喬翊","曾雨晴","邱詩涵"]  
+  學號: ["410773109","410773095","410773098","410773017","410773056"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+## 資料讀入
+library(dplyr); library(rvest); library(stringr)
+source("https://www.dropbox.com/s/4tubw8e5h3cem6w/theEconomist.R?dl=1")
+
+"https://www.economist.com/the-world-this-week/2019/11/21/politics-this-week" %>%
+  get_theWorldThisWeek() -> df_politics
+
+data(world,package = "spData")
+
+
+## 資料整理
+df_politics[11,] -> df_politics[c(18:19),]
+
+df_politics$identities[11] %>%
+  str_split(",") -> a
+
+a[[1]] -> df_politics$identities[c(11,18,19)]
+
+df_politics$identities %>%
+  str_sub(2,-2) %>%
+  str_replace("’s","") -> df_politics$identities
+
+df_politics$identities[15] <- "United Kingdom"
+df_politics$identities[c(3,6)] <- "United States"
+df_politics$identities[9] <- "Israel"
+df_politics$identities[12] <- "Brazil"
+df_politics$identities[16] <- "Sweden"
+df_politics$identities[4] <- "Republic of Korea"
+
+world[(world$name_long %in%
+  df_politics$identities),] -> df_politics_news
+```
+
+
+
+```{r graph, echo=T, eval=T}
+list() -> map
+
+data(world,package = "spData")
+
+world %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = df_politics_news, fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void()-> map$all
+
+
+world %>%
+  filter(
+    continent == "Africa"
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Africa")),
+          fill = "red",
+          alpha = 0.5, size =1) +
+  theme_void() -> map$Africa
+
+world %>%
+  filter(
+    region_un == "Americas"
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Americas")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void() -> map$Americas
+
+world %>%
+  .[-which(world$iso_a2 == "RU"),] %>%
+  filter(
+    region_un == "Europe"
+  ) %>%
+  st_crop(
+    xmin = -30, xmax = 80,
+    ymin = 0, ymax = 75
+  ) %>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Europe")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  theme_void() -> map$Europe
+  
+
+library(osmdata)
+# open pass query with bounding box
+bbox_HK <- opq(
+  bbox = c(113.7827,22.0827,114.4171,22.5692) 
+) 
+
+bbox_HK %>% 
+  add_osm_feature(
+    key="admin_level", value="5"
+  ) %>%
+  osmdata_sf() -> map_HK_administrative
+
+map_HK_administrative$osm_lines -> map_HK_line
+
+
+world %>%
+  filter(
+    region_un == "Asia"
+  )%>%
+  ggplot() +
+  geom_sf() +
+  geom_sf(data = (df_politics_news %>%
+                    filter(region_un == "Asia")),
+          fill = "red",
+          alpha = 0.5, size = 1) +
+  geom_sf(data = map_HK_line,aes(color = "red",size = 1))+
+  theme_void()+
+  theme(
+    legend.position = "none"
+  )-> map$Asia
+```
+
+
+```{r graph, echo=T, eval=T}
+
+##1..把"歐洲"df 其中geom資料由polygon轉為中心點
+df_politics_news[(df_politics_news$region_un=="Europe"),] %>%
+  st_centroid(of_largest_polygon = T) -> df_center_Europe
+
+##2.取出中心點的座標
+df_center_Europe%>%
+  st_coordinates() -> coordinates_Europe
+
+##3.處理資料
+#中心點們的座標目前為matrix，要把matrix轉為data.frame
+#若最後檢查圖案發現label太擠，要先在這邊的df調整X及Y的值
+#若一個地區有複數個事件，要先在這邊的df新增一筆資料，設定好第二個label的XY座標
+as.data.frame(coordinates_Europe) -> df_coordinates_Europe
+
+##4.新增一變數名為`event`，底下的值是該座標對應到的事件。
+df_coordinates_Europe %>%
+  mutate(
+    event=c("4-5","4-6","4-4")
+  ) ->df_coordinates_Europe
+
+##5.畫上label(只要正確處理上面步驟4.及步驟5.，這邊完全不用動就可以生成有label的地圖)
+map$Europe+
+  geom_label(
+    data = df_coordinates_Europe,
+    aes(x=X,y=Y,label=event)
+  ) -> map$Europe_label
+
+
+
+##把"Americas"df 其中geom資料由polygon轉為中心點
+df_politics_news[(df_politics_news$region_un=="Americas"),] %>%
+  st_centroid(of_largest_polygon = T) -> df_center_Americas
+
+##取出中心點的座標
+df_center_Americas%>%
+  st_coordinates() -> coordinates_Americas
+
+##處理資料
+as.data.frame(coordinates_Americas) -> df_coordinates_Americas
+df_coordinates_Americas <- rbind(df_coordinates_Americas,
+                                 c(-75.2422,31.4227),
+                                 c(-132.1019,39.2627),
+                                 c(-126.5507,31.1718),
+                                 c(-112.2900,45.5141))
+df_coordinates_Americas%>%
+  slice(c(-2,-4)) -> df_coordinates_Americas
+df_coordinates_Americas <-rbind(df_coordinates_Americas,
+                                c(-79.2103,-31.0505),
+                                c(-78.0729,-16.3340))
+df_coordinates_Americas <- round(df_coordinates_Americas,4)
+
+##新增`event`
+df_coordinates_Americas %>%
+  mutate(
+    event=c("4-1","3-2","5-1","2-1","2-2","1-3","4-2","4-3")
+  ) ->df_coordinates_Americas
+
+##畫上label
+map$Americas +
+  geom_label(
+    data = df_coordinates_Americas,
+    aes(x=X,y=Y,label=event)
+  )  -> map$Americas_label
+
+
+
+##把"Asia"df 其中geom資料由polygon轉為中心點
+df_politics_news[(df_politics_news$region_un=="Asia"),] %>%
+  st_centroid(of_largest_polygon = T) -> df_center_Asia
+
+##取出中心點的座標
+df_center_Asia%>%
+  st_coordinates() -> coordinates_Asia
+
+##處理資料
+as.data.frame(coordinates_Asia) -> df_coordinates_Asia
+df_coordinates_Asia %>%
+  slice(-1,-2,-5,-6)->df_coordinates_Asia
+
+df_coordinates_Asia <- rbind(df_coordinates_Asia,
+                             c(115.0022,19.3439),
+                             c(133.3009,38.5843),
+                             c(85.2737,10.2738),
+                             c(32.5128,39.0700),
+                             c(31.2059,32.1032))
+
+##新增`event`
+df_coordinates_Asia %>%
+  mutate(
+    event=c("5-2","1-2","1-1","2-1","3-1","1-4","1-3")
+  ) ->df_coordinates_Asia
+
+##畫上label
+map$Asia +
+  geom_label(
+    data = df_coordinates_Asia,
+    aes(x=X,y=Y,label=event)
+  ) -> map$Asia_label
+
+
+
+
+df_politics_news[7,] %>%
+  st_centroid(of_largest_polygon = T) -> df_center_Faso
+
+##取出中心點的座標
+df_center_Faso%>%
+  st_coordinates() -> coordinates_Faso
+
+##處理資料
+as.data.frame(coordinates_Faso) -> df_coordinates_Faso
+df_coordinates_Faso$X+6 ->df_coordinates_Faso$X
+df_coordinates_Faso$Y+10.5 ->df_coordinates_Faso$Y
+
+##新增`event`
+df_coordinates_Faso %>%
+  mutate(
+    event=c("1-5")
+  ) ->df_coordinates_Faso
+
+##畫上label
+map$Africa +
+  geom_label(
+    data = df_coordinates_Faso,
+    aes(x=X,y=Y,label=event)
+  ) -> map$Africa_label
+
+map
+```
+
+
+```{r graph, echo=T, eval=T}
+graphData <- list()
+Country <-c("Sri Lanka",
+        "Honkong",
+        "US",
+        "South Korea",
+        "US",
+        "Afghanistan",
+        "US",
+        "Iran",
+        "Israel",
+        "US",
+        "Syria",
+        "Burkina Faso",
+        "Mali",
+        "Niger",
+        "Brazil",
+        "Chile",
+        "Bolivia",
+        "Britain",
+        "Sweden",
+        "Belarus")
+
+Event <- c("Election",
+           "Defiance",
+           "Law",
+           "Diplomatic",
+           "Diplomatic",
+           "Law",
+           "Election",
+           "Defiance",
+           "Defiance",
+           "Defiance",
+           "Defiance",
+           "Defiance",
+           "Defiance",
+           "Defiance",
+           "Environment",
+           "Environment",
+           "Environment",
+           "Environment",
+           "Environment",
+           "Environment"
+           )
+
+Continent <-c("Asia",
+              "Asia",
+              "America",
+              "Asia",
+              "America",
+              "Asia",
+              "America",
+              "Asia",
+              "Asia",
+              "America",
+              "Asia",
+              "Africa",
+              "Africa",
+              "Africa",
+              "America",
+              "America",
+              "America",
+              "Europe",
+              "Europe",
+              "Europe"
+)
+politics <- data.frame(Country,Event,Continent)
+
+colorspace::diverging_hcl(n = 5, h = c(255, 265), c = c(134, 104), l = c(36, 49), power = c(0.85, 0.85), register = "Custom-Palette") 
+politics -> graphData$politicsCategory
+graphData$politicsCategory %>%
+  ggplot()+
+  geom_point( aes(
+    x = Event,
+    y = Country,
+    size = 15,
+    color = Event
+  ),shape = 18)+
+  scale_color_discrete_diverging(palette = "Custom-Palette")+
+  labs(title = "Event Category",
+       caption = "Source: The Economist"
+       )+
+  theme(plot.title = element_text(color = "#002F70",face = "bold",size = 20),
+        plot.caption = element_text(color = "#002F70"),
+        legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_rect(fill = 	"#DEFFFF"),
+        axis.line = element_line(colour = "#002F70"),
+        axis.ticks = element_line(colour = "#002F70"),
+        axis.text = element_text(colour = "#002F70")
+        ) -> graphData$politicsCategory_graph
+graphData$politicsCategory_graph +
+  facet_grid(Continent~. , scales = "free_y",space = "free_y") -> facet
+facet
+```

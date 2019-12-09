@@ -1,0 +1,44 @@
+---
+title: "1204 FlexDashboard Example"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    self_contained: false
+    lib_dir: "support"
+---
+
+```{r setup, include=FALSE}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+library(flexdashboard)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+load("graph.Rda")
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+

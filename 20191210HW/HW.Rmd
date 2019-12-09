@@ -1,0 +1,140 @@
+---
+title: "The Economist's political news map"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: journal
+    orientation: columns
+    vertical_layout: fill
+    self_contained: false
+    lib_dir: support
+---
+
+```{r basic setup, message=FALSE, echo=F, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+Column {.tabset data-width=600}
+-------------------------------------
+    
+### World Map
+    
+```{r}
+load("mapWithLabel_new.rda")
+map$all
+```
+
+### Africa 
+
+```{r}
+map$Africa_label
+```
+
+### America
+
+```{r}
+map$Americas_label
+```
+
+### Asia
+
+```{r}
+map$Asia_label
+```
+
+### Europe
+
+```{r}
+map$Europe_label
+```
+
+
+### Statistics
+
+<img src="Statistic.png">
+
+
+Column {.tabset data-width=400}
+-------------------------------------
+   
+### <b>1.Defiance</b>  <img src="Defiance.png" width="20px"> 
+
+<b><1-1></b><br/>
+Police shot rubber bullets at the protesters occupying <b>Hong Kong</b> Polytechnic University. Most of the students eventually left the campus. Meanwhile, a court in Hong Kong overturned *a ban on wearing masks in the protests*, finding it contravened the territory’s Basic Law. The decision was denounced by China’s National People’s Congress, which suggested that only it had the power to rule on constitutional issues in Hong Kong. 
+<br/><br/>
+
+<b><1-2></b><br/>
+Large protests erupted in **Iran** after the government *increased the price of heavily subsidised fuel*. Demonstrators blocked traffic, torched banks and burnt petrol stations. Ayatollah Ali Khamenei, the supreme leader, called the protesters “thugs” and blamed foreign powers for the unrest. Dozens of people have been killed by the authorities, say human-rights groups.
+<br/><br/>
+
+<b><1-3></b><br/>
+Mike Pompeo, **America’s** secretary of state, announced that **Israeli** settlements in the occupied West Bank are consistent with international law. Most of Israel’s other allies disagree. Past American administrations largely dodged the question. The decision will have no immediate effect on the ground, but it may embolden Israeli politicians who want to annex the settlements. Meanwhile, Benny Gantz missed the deadline to form a government in Israel, raising the possibility of another election, as Binyamin Netanyahu faced mounting legal woes.
+<br/><br/>
+
+<b><1-4></b><br/>
+Israel carried out *air strikes* in **Syria**, hitting targets belonging to the government and its Iranian allies. The attacks were in response to rockets fired at Israel by Iranian forces.
+<br/><br/>
+
+<b><1-5></b><br/>
+Escalating conflicts in **Burkina Faso**, **Mali** and **Niger** have created a humanitarian crisis in which 2.4m people need urgent food aid, said the UN’s World Food Programme. The worst affected is Burkina Faso, where more than half a million people have fled their homes.
+ 
+### <b>2.Diplomatic</b>  <img src="Diplomatic.png" width="20px">  
+
+<b><2-1></b><br/>
+America walked out of talks in Seoul with **South Korea** in a dispute about paying for American troops stationed in the country. South Korean politicians say America wants $5bn a year, five times what it is getting now from the South Korean government.
+<br/><br/>
+
+<b><2-2></b><br/>
+A jury found *Roger Stone* guilty on all charges related to obstruction of the Mueller investigation into Russian interference in **American** politics. Mr Stone is a Republican operative who earned his stripes on Richard Nixon’s campaign. He once claimed to have “launched the idea” of Mr Trump for president.
+
+### <b>3.Election </b>  <img src="Election.png" width="20px">
+
+<b><3-1></b><br/>
+**Sri Lanka’s** presidential election was won by Gotabaya Rajapaksa, the younger brother of Mahinda Rajapaksa, a former president who oversaw the bloody end to an insurrection by Tamil separatists. Gotabaya Rajapaksa was defence secretary during the fighting. His Sinhala-Buddhist nationalist campaign pledged to wipe out terrorism, following attacks at Easter by jihadists, in which 268 people died. The elder Mr Rajapaska will be prime minister.
+<br/><br/>
+
+<b><3-2></b><br/>
+Gordon Sondland, **America’s** ambassador to the EU and the star witness in the *impeachment inquiry* into Donald Trump, gave his public testimony to the House. Mr Sondland said he and others had followed orders from the president to put pressure on Ukraine to dig up dirt on Joe Biden and that the Ukrainians knew there would be a clear “quid pro quo” if they co-operated. He also said “everyone was in the loop”, including Mike Pompeo, the secretary of state, and Mike Pence, the vice-president.
+<br/><br/>
+
+
+### <b>4.Environment</b>  <img src="Environment.png" width="20px">
+
+<b><4-1></b><br/>
+The pace of deforestation of the **Brazilian** Amazon in the year to July reached its highest level in a decade, said the country’s space agency. It was nearly 30% faster than in the previous year. Environmentalists blame Brazil’s populist president, Jair Bolsonaro, who wants to open the region to miners and ranchers.
+<br/><br/>
+
+<b><4-2></b><br/>
+Following a wave of political protests, **Chile’s** government agreed to hold a referendum in April on whether the country should write a new constitution. Chileans will be able to decide what sort of body should draft it and will also be able to vote on the final text of a constitution.
+<br/><br/>
+
+<b><4-3></b><br/>
+The death toll in the unrest leading up to and after Evo Morales’s resignation as **Bolivia’s** president rose to at least 32 people. Security forces fired on pro-Morales demonstrators who had blocked a fuel plant near the capital, La Paz. The protesters want the interim president, Jeanine Áñez, to resign. They also want new elections. A decree by the interim government appeared to encourage the police to be overzealous in their efforts to quell protests.
+<br/><br/>
+
+<b><4-4></b><br/>
+**Britain’s** two main party leaders clashed in the first televised election debate. The courts rejected demands from the Liberal Democrats and the Scottish National Party that they should be included. Boris Johnson, the Conservative prime minister, did slightly better than Jeremy Corbyn, the far-left leader of the Labour Party. The Conservatives’ press office altered its Twitter account to look like a fact-checking service.
+<br/><br/>
+
+<b><4-5></b><br/>
+Prosecutors in **Sweden** formally ended an investigation into rape allegations made against Julian Assange, the founder of WikiLeaks, a website that publishes official secrets. Mr Assange remains in custody in London while a case for his extradition to America is considered.
+<br/><br/>
+
+<b><4-6></b><br/>
+Parliamentary elections were held in **Belarus**, the former Soviet republic whose president, Alexander Lukashenko, has been in uncontested power for the past 25 years. The opposition won no seats at all.
+
+### <b>5.Law</b>  <img src="Law.png" width="20px">  
+
+<b><5-1></b><br/>
+The **American** Congress passed *the Hong Kong Freedom and Democracy bill*, a largely symbolic act that will anger China and encourage the protesters. Donald Trump is expected to sign it.
+<br/><br/>
+
+<b><5-2></b><br/>
+The Taliban released two academics, one American and one Australian, whom it had held captive since 2016, in exchange for three militants. **Afghanistan’s** president, Ashraf Ghani, said the swap of hostages for prisoners was necessary to kick-start peace talks with the jihadists.
+<br/><br/>

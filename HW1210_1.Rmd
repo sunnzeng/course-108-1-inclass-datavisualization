@@ -1,0 +1,24 @@
+---
+title: "HW7"
+author: "Sunny"
+date: "2019/12/2"
+output: html_document
+---
+
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+
+
+```{r}
+data(world,package="spData")
+```
+
