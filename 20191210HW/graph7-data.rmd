@@ -11,7 +11,7 @@ params:
 以下為老師執行時一定會存在的環境設定
 ```{r basic setup, message=FALSE, echo=TRUE, eval=T}
 rm(list=ls())
-library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales); library(sf)
 library(tidyr); library(showtext); library(tidyverse); library(colorspace)
 
 #font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
