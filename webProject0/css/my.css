@@ -1,0 +1,9 @@
+
+img, #myTargetElement, .myBlue {
+  border-style: dashed !Important; 
+  padding: 15px 15px; 
+  background-color: aliceblue
+}
+.myFont{
+  font-size: 10px
+}

@@ -1,0 +1,60 @@
+---
+title: "課堂練習"
+author: "曾雨晴"
+date: "10/02/2019"
+output: html_document
+---
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext); library(colorspace); library(scales); library(magick); library(sf); library(rmapshaper); library(osmdata); library(plotly); library(leaflet); 
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+###7.1.2 A simple website project
+
+```{r}
+source("https://www.dropbox.com/s/mdx4777ugnluspz/webApplications.R?dl=1")
+```
+
+```{r}
+project_html_create(
+  main_file="index.html",
+  type="plain", # or bs : bootstrap
+  dirlib="webProject0",
+  structure=c(
+    "js",
+    "css",
+    "assets")
+)
+```
+
+```{r}
+file.edit("my.css")
+```
+
+```{r}
+dir.create(
+  "./1211"
+)
+download.file("https://raw.githubusercontent.com/tim8537099/course-108-1-inclass-datavisualization/master/example/tet.Rmd",
+              destfile="1211/tet.Rmd"
+)
+download.file("https://github.com/tim8537099/course-108-1-inclass-datavisualization/blob/master/example/plot_us.Rda?raw=true",
+              destfile="1211/plot_us.Rda"
+)
+
+file.edit("1211/tet.Rmd")
+```
+
+```{r}
+c("external/header","external/before_body","external/after_body") %>%
+  lapply(dir.create, recursive=T)
+```
+
+```{r}
+file.edit("external/header/headerScript.html")
+```
+

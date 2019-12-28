@@ -1,0 +1,31 @@
+---
+title: "課堂練習"
+author: "曾雨晴"
+date: "10/02/2019"
+output: html_document
+---
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext); library(colorspace); library(scales); library(magick); library(sf); library(rmapshaper); library(osmdata); library(plotly); library(leaflet); library(gridSVG)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+```{r}
+source("https://www.dropbox.com/s/mdx4777ugnluspz/webApplications.R?dl=1", encoding = "UTF-8" )
+```
+
+
+##Create a New Project
+
+```{r}
+webapp_project_create(dirlib="./20191225")
+```
+
+```{js}
+var jd = document.getElementById('json1').innerHTML
+var jsd=JSON.parse(jd)
+```
+

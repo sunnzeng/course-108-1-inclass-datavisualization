@@ -12,7 +12,7 @@ params:
 ```{r basic setup, message=FALSE, echo=TRUE, eval=T}
 rm(list=ls())
 library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
-library(tidyr); library(showtext); library(tidyverse); library(colorspace)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(gridSVG)
 
 #font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
 showtext_auto(enable=TRUE) #啟用字體

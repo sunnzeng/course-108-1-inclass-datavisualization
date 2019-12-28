@@ -1,0 +1,55 @@
+---
+title: "課堂練習"
+author: "曾雨晴"
+date: "12/18/2019"
+output: html_document
+---
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(tidyr); library(showtext); library(colorspace); library(scales); library(magick); library(sf); library(rmapshaper); library(osmdata); library(plotly); library(leaflet); library(gridSVG)
+
+font_add("QYuan","C:/Users/User/Downloads/cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(out.width='80%', fig.asp=.75, fig.align='center', fig.showtext=T)
+```
+
+```{r}
+source("https://www.dropbox.com/s/mdx4777ugnluspz/webApplications.R?dl=1", encoding = "UTF-8")
+```
+
+```{r}
+dir.create(
+  "./1211"
+)
+download.file("https://raw.githubusercontent.com/tim8537099/course-108-1-inclass-datavisualization/master/example/tet.Rmd",
+              destfile="1211/tet.Rmd"
+)
+
+
+file.edit("1211/tet.Rmd")
+```
+
+
+## Create a New Project
+
+```{r}
+#webapp_project_create(
+  #dirlib="./1211/webapp",
+  #overwrite = T
+#)
+```
+
+```{r}
+#download.file("https://www.dropbox.com/s/1epjlhcb6nwck7n/webProjectTemplate.zip?dl=1")
+```
+
+```{r}
+#servr::httd(dir="")
+```
+
+```{r}
+download.file("https://www.dropbox.com/s/99tfecfkblpsij8/getSVGelement.zip?dl=1",
+              destfile = "getSVGelement.zip")
+unzip("getSVGelement.zip")
+```
+

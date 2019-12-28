@@ -23,7 +23,7 @@ knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
 Column {.tabset data-width=600}
 -------------------------------------
     
-### World Map
+### World Map {data-height="100%"}
     
 ```{r}
 load("mapWithLabel_new.rda")

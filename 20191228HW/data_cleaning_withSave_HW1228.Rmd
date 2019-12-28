@@ -1,0 +1,340 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["曾雨晴"]  
+  學號: ["410773017"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(gridSVG)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+graphData<-list()
+
+library(readr)
+mock_ufo_data_facebook <- read_csv("mock_ufo_data_facebook.csv")
+mock_ufo_data_poster <- read_csv("mock_ufo_data_poster.csv")
+mock_ufo_data_website <- read_csv("mock_ufo_data_website.csv")
+
+mock_ufo_data_facebook<-
+  mock_ufo_data_facebook[-(62:71),-(3:7)]
+mock_ufo_data_poster<-
+  mock_ufo_data_poster[-(53:59),]
+mock_ufo_data_website<-
+  mock_ufo_data_website[-(72:80),]
+
+mock_ufo_data_facebook%>%
+  group_by(`event title`)%>%
+  summarise(facebook=n())->mock_ufo_data_1
+
+mock_ufo_data_poster%>%
+  group_by(`event title`)%>%
+  summarise(poster=n())->mock_ufo_data_2
+
+mock_ufo_data_website%>%
+  group_by(`event title`)%>%
+  summarise(website=n())->mock_ufo_data_3
+
+merge(mock_ufo_data_1,mock_ufo_data_2,by="event title")-> mock_ufo_data
+
+merge(mock_ufo_data,mock_ufo_data_3,by="event title")->mock_ufo_data
+
+mock_ufo_data<-
+  mock_ufo_data[,-1]
+
+mock_ufo_data%>%
+  mutate(
+    total=rowSums(mock_ufo_data)
+  )->mock_ufo_data
+
+row.names(mock_ufo_data)<-
+  c("北大玩具節","青銀共賞電影","聖誕點燈暨北大管樂節")
+
+
+mock_ufo_data_facebook%>%
+  mutate(
+    timestamp=ymd_hms(timestamp),
+    日期=str_sub(timestamp,1,10),
+    時間=str_sub(timestamp,12,13)
+  )->mock_ufo_data_facebook
+
+mock_ufo_data_poster%>%
+  mutate(
+    timestamp=ymd_hms(timestamp),
+    日期=str_sub(timestamp,1,10),
+    時間=str_sub(timestamp,12,13)
+  )->mock_ufo_data_poster
+
+mock_ufo_data_website%>%
+  mutate(
+    timestamp=ymd_hms(timestamp),
+    日期=str_sub(timestamp,1,10),
+    時間=str_sub(timestamp,12,13)
+  )->mock_ufo_data_website
+
+
+mock_ufo_data_facebook%>%
+  group_by(日期)%>%
+  summarise(次數=n())->mock_ufo_data_facebook_1
+
+mock_ufo_data_poster%>%
+  group_by(日期)%>%
+  summarise(次數=n())->mock_ufo_data_poster_1
+
+mock_ufo_data_website%>%
+  group_by(日期)%>%
+  summarise(次數=n())->mock_ufo_data_website_1
+
+mock_ufo_data_facebook_1%>%
+  ggplot()+
+  geom_line(aes(x=日期,y=次數,group=1))+
+  geom_point(aes(x=日期,y=次數))+
+  geom_text(aes(x=日期,y=次數,label=次數),hjust=-1)+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5),
+    panel.background = element_rect(color = "transparent"),
+    panel.grid = element_line()
+    )->graphData$mock_ufo_data_facebook
+
+mock_ufo_data_poster_1%>%
+  ggplot()+
+  geom_line(aes(x=日期,y=次數,group=1))+
+  geom_point(aes(x=日期,y=次數))+
+  geom_text(aes(x=日期,y=次數,label=次數),hjust=-1)+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5),
+    panel.background = element_rect(color = "transparent"),
+    panel.grid = element_line()
+    )->graphData$mock_ufo_data_poster
+
+mock_ufo_data_website_1%>%
+  ggplot()+
+  geom_line(aes(x=日期,y=次數,group=1))+
+  geom_point(aes(x=日期,y=次數))+
+  geom_text(aes(x=日期,y=次數,label=次數),hjust=-1)+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5),
+    panel.background = element_rect(color = "transparent"),
+    panel.grid = element_line()
+    )->graphData$mock_ufo_data_website
+
+merge(mock_ufo_data_facebook_1,mock_ufo_data_poster_1,by="日期", all.x=T)%>%
+  merge(.,mock_ufo_data_website_1,by="日期", all.x=T)->mock_ufo_data_date
+
+mock_ufo_data_date[is.na(mock_ufo_data_date)]=0
+
+colnames(mock_ufo_data_date)<-
+  c("日期","Facebook","Poster","Website")
+
+mock_ufo_data_date%>%
+  mutate(
+    總次數=Facebook+Poster+Website
+  )->mock_ufo_data_date
+
+gather(mock_ufo_data_date,
+       "Facebook","Poster","Website",
+       key = "種類", value="總次數")->mock_ufo_data_date_1
+
+mock_ufo_data_date%>%
+  ggplot()+
+  geom_line(aes(x=日期,y=總次數,group=1))+
+  geom_point(aes(x=日期,y=總次數))+
+  geom_text(aes(x=日期,y=總次數,label=總次數),hjust=-1)+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5),
+    panel.background = element_rect(color = "transparent")
+    )->graphData$mock_ufo_data_date
+
+colorspace::sequential_hcl(n = 8, h = c(0, 35), c = c(65, 100, 5), l = c(20, 97), power = c(0.05, 1.45), register = "Palette4")
+
+mock_ufo_data_date_1%>%
+  ggplot()+
+  geom_raster(aes(x=日期,y=種類,fill=總次數))+
+  scale_fill_continuous_sequential(palette = "Palette4",breaks=c(0,2,4,6,8,10))+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.line.x = element_blank(),
+    axis.ticks.x= element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    panel.background = element_rect(color = "transparent")
+    )->graphData$mock_ufo_data_date_raster
+
+mock_ufo_data_facebook%>%
+  group_by(時間)%>%
+  summarise(次數=n())->mock_ufo_data_facebook_2
+
+mock_ufo_data_poster%>%
+  group_by(時間)%>%
+  summarise(次數=n())->mock_ufo_data_poster_2
+
+mock_ufo_data_website%>%
+  group_by(時間)%>%
+  summarise(次數=n())->mock_ufo_data_website_2
+
+merge(mock_ufo_data_facebook_2,mock_ufo_data_poster_2,by="時間", all.x=T)%>%
+  merge(.,mock_ufo_data_website_2,by="時間", all.x=T)->mock_ufo_data_time
+
+mock_ufo_data_time[is.na(mock_ufo_data_time)]=0
+
+colnames(mock_ufo_data_time)<-
+  c("時間","Facebook","Poster","Website")
+
+mock_ufo_data_time%>%
+  mutate(
+    總次數=Facebook+Poster+Website
+  )->mock_ufo_data_time
+
+gather(mock_ufo_data_time,
+       "Facebook","Poster","Website",
+       key = "種類", value="總次數")->mock_ufo_data_time_1
+
+mock_ufo_data_time%>%
+  ggplot()+
+  geom_line(aes(x=時間,y=總次數,group=1))+
+  geom_point(aes(x=時間,y=總次數))+
+  geom_text(aes(x=時間,y=總次數,label=總次數),hjust=-1)+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5),
+    panel.background = element_rect(color = "transparent"),
+    panel.grid = element_line()
+    )->graphData$mock_ufo_data_time
+
+colorspace::sequential_hcl(n = 8, h = c(0, 35), c = c(65, 100, 5), l = c(20, 97), power = c(0.05, 1.45), register = "Palette4")
+
+mock_ufo_data_time_1%>%
+  ggplot()+
+  geom_raster(aes(x=時間,y=種類,fill=總次數))+
+  scale_fill_continuous_sequential(palette = "Palette4",breaks=c(0,2,4,6,8,10))+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.ticks.x= element_blank(),
+    axis.line.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5)
+    )->graphData$mock_ufo_data_time_raster
+
+mock_ufo_data_facebook%>%
+  mutate(
+    "種類" = "Facebook"
+  )->mock_ufo_data_facebook
+
+mock_ufo_data_poster%>%
+  mutate(
+    "種類" = "Poster"
+  )->mock_ufo_data_poster
+
+mock_ufo_data_website%>%
+  mutate(
+    "種類" = "Website"
+  )->mock_ufo_data_website
+
+mock_ufo_data_facebook%>%
+  filter(`event title` == "北大玩具節")->mock_ufo_data_toy_1
+
+mock_ufo_data_poster%>%
+  filter(`event title` == "北大玩具節")->mock_ufo_data_toy_2
+
+mock_ufo_data_website%>%
+  filter(`event title` == "北大玩具節")->mock_ufo_data_toy_3
+
+rbind(mock_ufo_data_toy_1,mock_ufo_data_toy_2,mock_ufo_data_toy_3)->mock_ufo_data_toy
+
+colorspace::sequential_hcl(n = 3, h = c(0, 35), c = c(65, 100, 50), l = c(20, 97), power = c(0.05, 1.45), register = "Palette4")
+mock_ufo_data_toy%>%
+  ggplot()+
+  geom_bar(aes(x=日期, fill=種類))+
+  scale_fill_discrete_sequential(palette="Palette4")+
+  theme(
+    axis.text.x = element_text(angle = 45,hjust = 1),
+    axis.line.x = element_blank(),
+    axis.ticks.x= element_blank(),
+    axis.line.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_text(angle = 0,vjust = 0.5)
+    )
+
+
+
+save(graphData,file="graphData.Rda")
+
+graphData$mock_ufo_data_time
+
+#choose_palette(gui="shiny")
+
+# save(<所有在graph_story.Rmd要用的物件列出來，中間用逗號分隔>, file="graphData.Rda") # 此行放在最後一行
+```
+
+
+```{r eval=FALSE}
+mock_ufo_data_poster%>%
+  mutate(
+    timestamp=ymd_hms(timestamp)
+    )->mock_ufo_data_poster
+
+mock_ufo_data_facebook%>%
+  mutate(
+    timestamp=ymd_hms(timestamp),
+    
+    )->mock_ufo_data_facebook
+
+mock_ufo_data_website%>%
+  mutate(
+    timestamp=ymd_hms(timestamp)
+    )->mock_ufo_data_website
+
+```
+

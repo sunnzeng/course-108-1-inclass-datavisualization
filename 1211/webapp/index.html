@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plain</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<h1>This is a Heading</h1>
+<p>This is a paragraph.</p>
+<div id="target"></div>
+
+<object id="myObject" data="plot1.svg" type="image/svg+xml" width="100%"></object>
+<div id=answer></div>
+
+
+<script>
+var targetObj = document.getElementById('myObject').contentDocument;
+var uberEl = targetObj.getElementById('GRID.rastergrob.100.1');
+var myAnwser = document.getElementById('answer')
+
+function giveInformation(){
+    myAnwser.innerHTML = "UBER News"}
+
+uberEl.addEventListener("mouseover",giveInformation())
+</script>
+
+
+</body>
+</html>
+
