@@ -307,11 +307,16 @@ mock_ufo_data_toy%>%
     axis.title.y = element_text(angle = 0,vjust = 0.5)
     )
 
+ggsave(graphData$mock_ufo_data_date_raster, file="mock_ufo_data_date_raster.svg")
+ggsave(graphData$mock_ufo_data_facebook, file="mock_ufo_data_facebook.svg")
 
+graphData$mock_ufo_data_date_raster
+gridSVG::grid.export("mock_ufo_data_date_raster.svg", addClasses = T)
 
 save(graphData,file="graphData.Rda")
 
-graphData$mock_ufo_data_time
+
+graphData$mock_ufo_data_time_raster
 
 #choose_palette(gui="shiny")
 
@@ -336,5 +341,9 @@ mock_ufo_data_website%>%
     timestamp=ymd_hms(timestamp)
     )->mock_ufo_data_website
 
+```
+
+```{r}
+source("https://www.dropbox.com/s/mdx4777ugnluspz/webApplications.R?dl=1", encoding = "UTF-8")
 ```
 

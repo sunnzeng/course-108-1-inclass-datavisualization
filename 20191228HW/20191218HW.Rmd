@@ -8,10 +8,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-library(flexdashboard)
+library(flexdashboard);library(dplyr);library(ggplot2);library(plotly)
 ```
 <!--"journal","readable","paper"-->
-
 
 All
 ==================================================================
@@ -21,18 +20,23 @@ Column {data-width=500}
 
 ### All
 
+<!--<object id="myObject" data="mock_ufo_data_date_raster.svg" type="image/svg+xml" width="500"></object>-->
 ```{r}
 load("graphData.Rda")
-graphData$mock_ufo_data_date_raster
+graphData$mock_ufo_data_date_raster%>%
+  ggplotly()
 ```
+
 
 Column {.tabset data-width=500}
 ------------------------------------------------------------------
+
 ### Facebook
 
 ```{r}
 graphData$mock_ufo_data_facebook
 ```
+
 
 ### Poster
 
