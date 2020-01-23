@@ -1,0 +1,48 @@
+---
+title: "Sidebar"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+成績單 {.sidebar data-width=300}
+-------------------------------------
+
+```{r}
+library(shiny)
+
+navlistPanel(
+    "各學年度成績",
+    tabPanel("107學年度"),
+    tabPanel("108學年度"),
+    tabPanel("109學年度"),
+    tabPanel("110學年度"),
+    tabPanel("歷屆排名"),
+    "畢業進度查詢",
+    tabPanel("必選修學分進度"),
+    tabPanel("通識學分進度"),
+    tabPanel("學分學程進度")
+        )
+
+sliderInput("rateThreshold", "Warn when rate exceeds:",
+            min = 0, max = 50, value = 3, step = 0.1
+)
+# Maximum number of raw data rows to keep
+numericInput("maxrows", "Recent downloads window:", 50)
+
+```
+
+
+
+Column {data-width=300}
+-------------------------------------
+    
+### Chart 1
+    
+```{r}
+```
+    
+### Chart 2
+
+```{r}
+```
+

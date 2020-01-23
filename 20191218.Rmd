@@ -51,5 +51,8 @@ file.edit("1211/tet.Rmd")
 download.file("https://www.dropbox.com/s/99tfecfkblpsij8/getSVGelement.zip?dl=1",
               destfile = "getSVGelement.zip")
 unzip("getSVGelement.zip")
+
+load("~/GitHub/course-108-1-inclass-datavisualization/finalProject.Rda")
+
 ```
 

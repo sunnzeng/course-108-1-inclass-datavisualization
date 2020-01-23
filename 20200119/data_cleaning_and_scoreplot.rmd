@@ -1,0 +1,143 @@
+---
+title: "每週一圖作業資料檔"
+output: html_document
+params:
+  組員: ["李靜怡"]  
+  學號: ["410773095"]
+---
+
+#### 環境設定
+
+以下為老師執行時一定會存在的環境設定
+```{r basic setup, message=FALSE, echo=TRUE, eval=T}
+rm(list=ls())
+library(dplyr); library(stringr); library(ggplot2); library(plotly); library(lubridate); library(readr); library(colorspace); library(grDevices); library(shiny); library(shinyjs); library(scales); library(rio)
+library(tidyr); library(showtext); library(tidyverse); library(colorspace); library(magick); library(magrittr)
+
+#font_add("QYuan","cwTeXQYuan-Medium.ttf") # 新增字體
+showtext_auto(enable=TRUE) #啟用字體
+theme_set(theme_classic())
+knitr::opts_chunk$set(fig.align='center', fig.showtext=T)
+```
+
+#### 資料處理
+  
+```{r data cleaning, echo=TRUE, eval=T}
+## 資料讀入
+load("finalProject.Rda")
+list() -> datacleaning
+
+##經濟系學生資料取出
+grepl("經濟",gradeData$系級) %>%
+  gradeData[.,] -> datacleaning$origin
+
+##必選修三大類別整理
+(datacleaning$origin$`必選修類別（必／選／通）` == "必")%>%
+  datacleaning$origin[.,] -> datacleaning$group$必修
+(datacleaning$origin$`必選修類別（必／選／通）` == "選")%>%
+  datacleaning$origin[.,] -> datacleaning$group$選修
+(datacleaning$origin$`必選修類別（必／選／通）` == "通")%>%
+  datacleaning$origin[.,] -> datacleaning$group$通識
+```
+
+###完全沒想到外系的必選修這麼麻煩...大失策qq
+```{r data cleaning, echo=TRUE, eval=T}
+##體育
+(datacleaning$group$必修$開課系所 == "體育") %>%
+  datacleaning$group$必修[.,] -> datacleaning$group$體育
+
+##國文
+grepl("國文",datacleaning$group$必修$科目名稱) %>%
+  datacleaning$group$必修[.,] -> datacleaning$group$國文
+
+##英文
+(datacleaning$group$必修$科目名稱 == "英文") %>%
+  datacleaning$group$必修[.,] -> datacleaning$group$英文
+
+##系必修
+c("經濟學原理","會計學","微積分","統計學","個體經濟學",
+  "總體經濟學","國際經濟學","經濟思想史","公共經濟學",
+  "貨幣銀行學","商事法") -> 經濟系必修
+datacleaning$group$必修$科目名稱 %in%
+  經濟系必修 %>%
+  datacleaning$group$必修[.,] -> datacleaning$group$系必修
+
+##外系必修(本系選修)
+(datacleaning$group$必修$科目名稱 %in%
+  經濟系必修) %>%
+  ifelse(F,T) %>%
+  datacleaning$group$必修[.,] -> datacleaning$group$外系必修
+datacleaning$group$外系必修[c(3,5,10,12,14,16,17),] ->
+  datacleaning$group$選修[c(23:29),]
+```
+
+
+###學期成績與虛擬排名
+```{r}
+datacleaning$origin %>%
+  group_by(學年,學期) %>%
+  summarise(
+    學期總成績 = sum(學期成績*學分數/sum(學分數))
+  ) -> datacleaning$scores
+datacleaning$scores$PR <- c(0.23,0.38,0.43,0.48,
+                            0.63,0.58,0.74,0.76)
+
+str_c(datacleaning$scores$學年,ifelse(datacleaning$scores$學期==1,0,5)) %>%
+  as.numeric() -> datacleaning$scores$學年學期
+str_c(datacleaning$scores$學年,"-",datacleaning$scores$學期)  -> datacleaning$scores$學年學期a
+```
+
+###資料檔
+```{r}
+save(datacleaning,file = "datacleaning.rda")
+```
+
+
+###畫圖時間
+```{r}
+list() -> plot
+datacleaning$scores %>%
+  ggplot(aes(x=學年學期,y=學期總成績)) +
+  geom_line(linetype = "dashed",color="red") +
+  geom_point(size = 2,color="red") +
+  geom_point(aes(x=datacleaning$scores$學年學期,
+             y=datacleaning$scores$PR*100),
+             color="blue",size = 2) +
+  geom_line(aes(x=datacleaning$scores$學年學期,
+             y=datacleaning$scores$PR*100),
+             color="blue",linetype = "dashed") +
+  scale_y_continuous(sec.axis = sec_axis(~.*0.01,name = "PR成績")) +
+  geom_text(aes(x=學年學期,y=學期總成績+4,
+                label=round(學期總成績,1)),color = "red") +
+  geom_text(aes(x=datacleaning$scores$學年學期,
+             y=datacleaning$scores$PR*100-4,
+             label=str_c(PR*100,"%")),color="blue") +
+  theme(
+    axis.line.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank()
+  ) +
+  labs(
+    title = "歷年成績",
+    subtitle = "學期成績與學期PR值"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5,size=30),
+    plot.subtitle = element_text(hjust = 0.5,size=12,
+                                 color="#727272")
+  ) +
+  geom_label(aes(x=1005,y=85),label="歷年學期成績",
+             color="red") +
+  geom_label(aes(x=1005,y=48),label="歷年PR成績",
+             color="blue") +
+  scale_x_continuous(breaks = c(1000,1005,1010,1015,1020,
+                                1025,1030,1035),
+                     labels = datacleaning$scores$學年學期a) -> plot$score
+```
+
+
+```{r}
+save(plot,file = "scorePlot.rda")
+```
+

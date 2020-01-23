@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Bootstrap 4 HTML</title>
+
+<!--以HTML語法寫下要放在head的內容, 不可使用任何code chunks-->
+
+<link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+
+<!--中文字體，必需在所有style sheets之後以取得優先權-->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/82e7182340.js" crossorigin="anonymous"></script>
+    <style>
+        body{
+            font-family: 'Noto Serif TC', serif; background-color:transparent;
+        }
+    </style>
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="https://pym.nprapps.org/pym.v1.min.js"></script>
+</head>
+
+<body>
+
+
+<!--以HTML語法寫下要放在body一開頭的內容, 不可使用任何code chunks-->
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">專業領域</th>
+      <th scope="col">科目名稱</th>
+      <th scope="col">類別</th>
+      <th scope="col">修習學期</th>
+      <th scope="col">學分數</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" rowspan="10">已修習系上選修</th>
+      <td>A</td>
+      <td>企業管理</td>
+      <td>全</td>
+      <td>100上/下</td>
+      <td>2/2</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td>社會學</td>
+      <td>半</td>
+      <td>100下</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>中級會計學</td>
+      <td>全</td>
+      <td>101上/下</td>
+      <td>3/3</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>民法概要</td>
+      <td>全</td>
+      <td>101上/下</td>
+      <td>2/2</td>
+    </tr>
+  </tbody>
+</table>
+<table class="table">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">專業領域</th>
+      <th scope="col">科目名稱</th>
+      <th scope="col">類別</th>
+      <th scope="col">修習學期</th>
+      <th scope="col">學分數</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row" rowspan="10">已修習共同選修</th>
+      <td></td>
+      <td>俄語(一)</td>
+      <td>全</td>
+      <td>101上/下</td>
+      <td>2/2</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>初級日文一</td>
+      <td>半</td>
+      <td>101下</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">專業領域</th>
+      <th scope="col">科目名稱</th>
+      <th scope="col">類別</th>
+      <th scope="col">修習學期</th>
+      <th scope="col">學分數</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"rowspan="10">已修習外系選修</th>
+      <td></td>
+      <td>心理學</td>
+      <td>半</td>
+      <td>100上</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>社會心理學</td>
+      <td>半</td>
+      <td>100下</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <th scope="row" colspan="5">總共修習</th>
+    <td>14/54</td>
+  </tfoot>
+</table>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">領域名稱</th>
+      <th scope="col">已修習學分數</th>
+      <th scope="col">缺少學分數</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">A</th>
+      <td>金融、貨幣與經濟成長</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th scope="row">B</th>
+      <td>產業與公共經濟</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th scope="row">C</th>
+      <td>人力、資源與環境經濟</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th scope="row">D</th>
+      <td>經濟理論與方法</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th scope="row">E</th>
+      <td>資料科學</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+
+<!--以HTML語法寫下要放在body結尾的內容, 不可使用任何code chunks-->
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="js/init.js"></script>
+
+
+<!-- code folding -->
+
+
+
+<script> new pym.Child(); </script>
+</body>
+</html>

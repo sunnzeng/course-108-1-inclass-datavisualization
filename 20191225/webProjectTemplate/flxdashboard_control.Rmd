@@ -2,7 +2,7 @@
 title: "範本"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
+   orientation: columns
     vertical_layout: fill
     css: ['css/mystyle.css']
     includes:
